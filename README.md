@@ -15,6 +15,7 @@ Desenvolver uma aplicação web que permita registrar vendas, despesas e movimen
 ## Equipe
 - Camila Nascimento dos Santos
 - Evelyn dos Santos Rofino
+- Gabriela Naomi Espindola Sato
 - Giovanna Clara Paes
 - Marina Sousa Maida
 - Raquel Moreira Ferreira
