@@ -1,9 +1,9 @@
 # Projeto Integrador
 
-Sistema de gestão desenvolvido para auxiliar uma artesã na organização de produtos, controle de estoque, produção e registro de vendas.
+Sistema digital de controle de caixa e gestão financeira desenvolvido para auxiliar mães solo microempreendedoras na organização de vendas, despesas e movimentações financeiras.
 
 ## Objetivo
-Desenvolver uma aplicação web que facilite a organização das atividades de uma artesã, permitindo gerenciar produtos, controlar o estoque e acompanhar as vendas.
+Desenvolver uma aplicação web que permita registrar vendas, despesas e movimentações de caixa, auxiliando na organização financeira de pequenos empreendimentos e contribuindo para a autonomia e o empoderamento feminino.
 
 ## Tecnologias utilizadas
 - HTML
@@ -13,9 +13,9 @@ Desenvolver uma aplicação web que facilite a organização das atividades de u
 - GitHub
 
 ## Equipe
-- Camila Nascimento Dos Santos
-- Evelyn Dos Santos Rofino
+- Camila Nascimento dos Santos
+- Evelyn dos Santos Rofino
 - Giovanna Clara Paes
 - Marina Sousa Maida
 - Raquel Moreira Ferreira
-- Tamara Da Costa E Silva
+- Tamara da Costa e Silva
