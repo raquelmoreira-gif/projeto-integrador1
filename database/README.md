@@ -1,6 +1,6 @@
 # Banco de Dados
 
-Estrutura inicial do banco de dados do sistema de controle de caixa.
+Estrutura do banco de dados do sistema de controle de caixa.
 
 ## Tabelas
 
@@ -21,15 +21,8 @@ Registra as vendas realizadas no caixa.
 Campos principais:
 - caixa_id: referência ao caixa
 - valor: valor da venda
-- forma_pagamento: tipo de pagamento (pix, dinheiro, crédito)
+- forma_pagamento: tipo de pagamento (pix, dinheiro, crédito, débito)
 - criado_em: data e hora da venda
-
----
-
-## Observações
-- Cada venda está vinculada a um caixa
-- Um caixa pode ter várias vendas
-- Estrutura em evolução conforme necessidades do sistema
 
 ---
 
@@ -41,10 +34,8 @@ Campos principais:
 - preco: valor de venda (não pode ser negativo)
 - quantidade_estoque: quantidade disponível em estoque (não pode ser negativa)
 - tipo: define se o produto é próprio ou consignado ('proprio' ou 'consignado')
-  
----
 
-### Regras:
+Regras:
 - Não permite valores negativos para preço e estoque
 - O tipo do produto é limitado a valores válidos para evitar inconsistências
 
@@ -60,7 +51,26 @@ Campos principais:
 - preco_unitario: valor no momento da venda
 - subtotal: valor total do item
 
-### Regras:
+Regras:
 - Não permite valores negativos
 - Quantidade deve ser maior que zero
 - Um produto não pode ser repetido na mesma venda
+
+---
+
+### 🧑‍🎨 artesaos
+Armazena os fornecedores de produtos consignados.
+
+Campos principais:
+- nome: nome do artesão
+- telefone: contato
+- email: contato
+
+---
+
+## Relacionamentos
+
+- Cada venda está vinculada a um caixa
+- Um caixa pode ter várias vendas
+- Cada venda pode conter vários produtos (vendas_itens)
+- Produtos consignados podem estar vinculados a um artesão através do campo `artesao_id`
