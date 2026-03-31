@@ -38,6 +38,14 @@ Armazena os produtos disponíveis para venda.
 
 Campos principais:
 - nome: nome do produto
-- preco: valor de venda
-- quantidade_estoque: quantidade disponível
-- tipo: próprio ou consignado
+- preco: valor de venda (não pode ser negativo)
+- quantidade_estoque: quantidade disponível em estoque (não pode ser negativa)
+- tipo: define se o produto é próprio ou consignado ('proprio' ou 'consignado')
+  
+---
+
+### Regras:
+- Não permite valores negativos para preço e estoque
+- O tipo do produto é limitado a valores válidos para evitar inconsistências
+
+---
