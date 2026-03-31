@@ -38,6 +38,26 @@ CREATE TABLE produtos (
   criado_em TIMESTAMP DEFAULT NOW()
 );
 -----------------------------------------------------------
+-- TABELA: artesaos
+-- armazena os fornecedores de produtos consignados
+
+CREATE TABLE artesaos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome TEXT NOT NULL,  
+  telefone TEXT, 
+  email TEXT, 
+  criado_em TIMESTAMP DEFAULT NOW()
+);
+------------------------------------------------------------
+-- RELAÇÃO: produtos → artesaos
+ALTER TABLE produtos
+ADD COLUMN artesao_id UUID;
+
+ALTER TABLE produtos
+ADD CONSTRAINT fk_artesao
+FOREIGN KEY (artesao_id)
+REFERENCES artesaos(id);
+----------------------------------------------------------
 -- TABELA: vendas_itens
 -- registra os produtos dentro de cada venda
 
@@ -60,5 +80,4 @@ CREATE TABLE vendas_itens (
 -- evita produto repetido na mesma venda
 CREATE UNIQUE INDEX unique_venda_produto 
 ON vendas_itens (venda_id, produto_id);
-------------------------------------------------------
-
+------------------------------------------
