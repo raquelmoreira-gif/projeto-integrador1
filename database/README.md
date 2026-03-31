@@ -49,3 +49,18 @@ Campos principais:
 - O tipo do produto é limitado a valores válidos para evitar inconsistências
 
 ---
+
+### 🧩 vendas_itens
+Relaciona produtos às vendas.
+
+Campos principais:
+- venda_id: referência à venda
+- produto_id: referência ao produto
+- quantidade: quantidade vendida
+- preco_unitario: valor no momento da venda
+- subtotal: valor total do item
+
+### Regras:
+- Não permite valores negativos
+- Quantidade deve ser maior que zero
+- Um produto não pode ser repetido na mesma venda
