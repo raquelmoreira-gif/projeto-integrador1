@@ -24,3 +24,20 @@ CREATE TABLE vendas (
     REFERENCES caixa(id)
     ON DELETE CASCADE
 );
+------------------------------------------------------
+-- TABELA: produtos
+-- armazena os produtos disponíveis para venda
+
+CREATE TABLE produtos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  nome TEXT NOT NULL,
+  
+  preco NUMERIC(10,2) NOT NULL,
+  
+  quantidade_estoque INTEGER DEFAULT 0,
+  
+  tipo TEXT NOT NULL, -- proprio ou consignado
+  
+  criado_em TIMESTAMP DEFAULT NOW()
+);
