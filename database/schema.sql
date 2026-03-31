@@ -1,3 +1,4 @@
+assim?
 -- TABELA: caixa
 -- controla abertura e fechamento diário
 
@@ -81,3 +82,22 @@ CREATE TABLE vendas_itens (
 CREATE UNIQUE INDEX unique_venda_produto 
 ON vendas_itens (venda_id, produto_id);
 ------------------------------------------
+-- ALTERAÇÃO: produtos (repasse consignado)
+
+ALTER TABLE produtos
+ADD COLUMN tipo_repasse TEXT CHECK (tipo_repasse IN ('porcentagem', 'fixo'));
+ALTER TABLE produtos
+ADD COLUMN porcentagem_repasse NUMERIC(5,2);
+ALTER TABLE produtos
+ADD COLUMN valor_custo NUMERIC(10,2);
+
+-- isso garante nunca usar os dois ao mesmo tempo e evita erro no sistema
+ALTER TABLE produtos
+ADD CONSTRAINT chk_repasse
+CHECK (
+  (tipo_repasse = 'porcentagem' AND porcentagem_repasse IS NOT NULL AND valor_custo IS NULL)
+  OR
+  (tipo_repasse = 'fixo' AND valor_custo IS NOT NULL AND porcentagem_repasse IS NULL)
+  OR
+  (tipo_repasse IS NULL)
+);
