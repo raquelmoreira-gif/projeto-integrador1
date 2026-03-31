@@ -216,7 +216,7 @@ CREATE TABLE movimentacoes_estoque (
 -- TRIGGERS: controle automático de estoque
 -- =========================================
 
--- valida se tem estoque antes de vender
+-- valida estoque antes da venda
 CREATE OR REPLACE FUNCTION validar_estoque()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -239,7 +239,9 @@ BEFORE INSERT ON vendas_itens
 FOR EACH ROW
 EXECUTE FUNCTION validar_estoque();
 
--- baixa o estoque automaticamente após venda
+--------------------------------------------------------
+
+-- baixa estoque após venda
 CREATE OR REPLACE FUNCTION baixar_estoque()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -255,3 +257,22 @@ CREATE TRIGGER trigger_baixar_estoque
 AFTER INSERT ON vendas_itens
 FOR EACH ROW
 EXECUTE FUNCTION baixar_estoque();
+
+--------------------------------------------------------
+
+-- devolve estoque ao cancelar venda
+CREATE OR REPLACE FUNCTION devolver_estoque()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE produtos
+  SET quantidade_estoque = quantidade_estoque + OLD.quantidade
+  WHERE id = OLD.produto_id;
+
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_devolver_estoque
+AFTER DELETE ON vendas_itens
+FOR EACH ROW
+EXECUTE FUNCTION devolver_estoque();
