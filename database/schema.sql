@@ -1,5 +1,6 @@
 -- TABELA: caixa
 -- controla abertura e fechamento diário
+
 CREATE TABLE caixa (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   data DATE NOT NULL,
@@ -30,14 +31,9 @@ CREATE TABLE vendas (
 
 CREATE TABLE produtos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  nome TEXT NOT NULL,
-  
-  preco NUMERIC(10,2) NOT NULL,
-  
-  quantidade_estoque INTEGER DEFAULT 0,
-  
-  tipo TEXT NOT NULL, -- proprio ou consignado
-  
+  nome TEXT NOT NULL, 
+  preco NUMERIC(10,2) NOT NULL CHECK (preco >= 0),
+  quantidade_estoque INTEGER DEFAULT 0 CHECK (quantidade_estoque >= 0),
+  tipo TEXT NOT NULL CHECK (tipo IN ('proprio', 'consignado')),
   criado_em TIMESTAMP DEFAULT NOW()
 );
