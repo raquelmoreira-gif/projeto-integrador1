@@ -30,3 +30,14 @@ Campos principais:
 - Cada venda está vinculada a um caixa
 - Um caixa pode ter várias vendas
 - Estrutura em evolução conforme necessidades do sistema
+
+---
+
+### 📦 produtos
+Armazena os produtos disponíveis para venda.
+
+Campos principais:
+- nome: nome do produto
+- preco: valor de venda
+- quantidade_estoque: quantidade disponível
+- tipo: próprio ou consignado
