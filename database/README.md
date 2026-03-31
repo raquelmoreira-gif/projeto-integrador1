@@ -15,9 +15,9 @@ Campos principais:
 
 Regras:
 - Apenas um caixa pode ser aberto por dia
+- Apenas um caixa pode estar aberto por vez
 - O status do caixa é limitado a 'aberto' ou 'fechado'
 - Não é possível fechar o caixa sem informar o valor final
-- Não é permitido abrir um novo caixa enquanto existir um caixa em aberto
 
 ---
 
@@ -50,6 +50,7 @@ Regras:
 - Não permite valores negativos para preço e estoque
 - O tipo do produto é limitado a valores válidos
 - Produtos consignados podem utilizar apenas um tipo de repasse (porcentagem ou fixo)
+- Produtos próprios não utilizam repasse
 - O estoque pode chegar a zero, mas não pode ser negativo
 
 ---
@@ -85,6 +86,8 @@ Regras:
 - Não permite valores negativos
 - Quantidade deve ser maior que zero
 - Um produto não pode ser repetido na mesma venda
+- O sistema valida automaticamente se há estoque suficiente antes da venda
+- O estoque é atualizado automaticamente após a venda
 
 ---
 
