@@ -17,7 +17,7 @@ Regras:
 - Apenas um caixa pode ser aberto por dia
 - O status do caixa é limitado a 'aberto' ou 'fechado'
 - Não é possível fechar o caixa sem informar o valor final
-
+- Não é permitido abrir um novo caixa enquanto existir um caixa em aberto
 ---
 
 ### 💰 vendas
