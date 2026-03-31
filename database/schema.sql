@@ -81,3 +81,13 @@ CREATE TABLE vendas_itens (
 CREATE UNIQUE INDEX unique_venda_produto 
 ON vendas_itens (venda_id, produto_id);
 ------------------------------------------
+-- ALTERAÇÃO: produtos (repasse consignado)
+
+ALTER TABLE produtos
+ADD COLUMN tipo_repasse TEXT CHECK (tipo_repasse IN ('porcentagem', 'fixo'));
+
+ALTER TABLE produtos
+ADD COLUMN porcentagem_repasse NUMERIC(5,2);
+
+ALTER TABLE produtos
+ADD COLUMN valor_custo NUMERIC(10,2);
