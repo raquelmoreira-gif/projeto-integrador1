@@ -23,6 +23,11 @@ CHECK (
   OR
   (status = 'fechado' AND valor_final IS NOT NULL)
 );
+
+-- impede mais de um caixa aberto ao mesmo tempo
+CREATE UNIQUE INDEX unique_caixa_aberto 
+ON caixa (status)
+WHERE status = 'aberto';
 -----------------------------------------------------
 -- TABELA: vendas
 -- registra cada venda realizada no caixa
