@@ -18,6 +18,7 @@ Regras:
 - O status do caixa é limitado a 'aberto' ou 'fechado'
 - Não é possível fechar o caixa sem informar o valor final
 - Não é permitido abrir um novo caixa enquanto existir um caixa em aberto
+
 ---
 
 ### 💰 vendas
@@ -49,6 +50,24 @@ Regras:
 - Não permite valores negativos para preço e estoque
 - O tipo do produto é limitado a valores válidos
 - Produtos consignados podem utilizar apenas um tipo de repasse (porcentagem ou fixo)
+- O estoque pode chegar a zero, mas não pode ser negativo
+
+---
+
+### 📦 movimentacoes_estoque
+Registra todas as entradas e saídas de produtos no estoque.
+
+Campos principais:
+- produto_id: referência ao produto
+- tipo: define se é 'entrada' ou 'saida'
+- quantidade: quantidade movimentada
+- motivo: motivo da movimentação (compra, venda, ajuste, devolução)
+- criado_em: data e hora da movimentação
+
+Regras:
+- Quantidade deve ser maior que zero
+- Tipo limitado a 'entrada' ou 'saida'
+- Não altera diretamente o estoque, apenas registra o histórico
 
 ---
 
@@ -84,4 +103,5 @@ Campos principais:
 - Cada venda está vinculada a um caixa
 - Um caixa pode ter várias vendas
 - Cada venda pode conter vários produtos (vendas_itens)
+- Produtos podem possuir múltiplas movimentações de estoque
 - Produtos consignados podem estar vinculados a um artesão através do campo `artesao_id`

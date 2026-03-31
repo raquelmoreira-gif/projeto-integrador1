@@ -118,3 +118,19 @@ CHECK (
   OR
   (tipo_repasse IS NULL)
 );
+--------------------------------------------------
+-- TABELA: movimentacoes_estoque
+-- registra entradas e saídas de estoque
+
+CREATE TABLE movimentacoes_estoque (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  produto_id UUID NOT NULL,
+  tipo TEXT NOT NULL CHECK (tipo IN ('entrada', 'saida')),
+  quantidade INTEGER NOT NULL CHECK (quantidade > 0),
+  motivo TEXT, -- compra, venda, ajuste, devolução
+  criado_em TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT fk_produto_movimentacao
+    FOREIGN KEY (produto_id)
+    REFERENCES produtos(id)
+    ON DELETE CASCADE
+);
