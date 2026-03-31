@@ -14,6 +14,15 @@ CHECK (status IN ('aberto', 'fechado'))
 -- impede mais de um caixa no mesmo dia
 CREATE UNIQUE INDEX unique_caixa_data 
 ON caixa (data);
+
+-- impede fechar caixa sem valor_final
+ALTER TABLE caixa
+ADD CONSTRAINT chk_caixa_fechamento
+CHECK (
+  (status = 'aberto' AND valor_final IS NULL)
+  OR
+  (status = 'fechado' AND valor_final IS NOT NULL)
+);
 -----------------------------------------------------
 -- TABELA: vendas
 -- registra cada venda realizada no caixa
