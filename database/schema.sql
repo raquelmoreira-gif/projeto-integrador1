@@ -9,3 +9,18 @@ CREATE TABLE caixa (
   fechado_em TIMESTAMP,
   status TEXT DEFAULT 'aberto'
 );
+-----------------------------------------------------
+-- TABELA: vendas
+-- registra cada venda realizada no caixa
+
+CREATE TABLE vendas (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  caixa_id UUID NOT NULL,
+  valor NUMERIC(10,2) NOT NULL,
+  forma_pagamento TEXT NOT NULL, -- pix, dinheiro, credito
+  criado_em TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT fk_caixa
+    FOREIGN KEY (caixa_id)
+    REFERENCES caixa(id)
+    ON DELETE CASCADE
+);

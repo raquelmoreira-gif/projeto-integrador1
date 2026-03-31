@@ -1,17 +1,32 @@
-# Database
-Esta pasta contém os arquivos relacionados ao banco de dados do projeto.
-O banco de dados utilizado será o PostgreSQL hospedado no Supabase.
-Aqui serão armazenados os scripts SQL e demais arquivos necessários para a criação e manutenção da estrutura do banco.
-A definição das tabelas e relacionamentos ainda está em fase de planejamento e será desenvolvida conforme o levantamento de requisitos do sistema.
-O objetivo do banco de dados é armazenar as informações necessárias para o funcionamento do sistema, como registros de vendas, produtos e demais dados da operação da loja.
+# Banco de Dados
 
-## Banco de Dados
+Estrutura inicial do banco de dados do sistema de controle de caixa.
 
-Tabela: caixa
+## Tabelas
 
-Responsável por controlar abertura e fechamento do caixa diário.
+### 🧾 caixa
+Responsável por controlar a abertura e fechamento do caixa diário.
 
-Campos:
+Campos principais:
+- data: data do caixa
 - valor_inicial: valor de troco inicial
 - valor_final: valor ao fechar o caixa
 - status: aberto ou fechado
+
+---
+
+### 💰 vendas
+Registra as vendas realizadas no caixa.
+
+Campos principais:
+- caixa_id: referência ao caixa
+- valor: valor da venda
+- forma_pagamento: tipo de pagamento (pix, dinheiro, crédito)
+- criado_em: data e hora da venda
+
+---
+
+## Observações
+- Cada venda está vinculada a um caixa
+- Um caixa pode ter várias vendas
+- Estrutura em evolução conforme necessidades do sistema
