@@ -35,9 +35,15 @@ Campos principais:
 - quantidade_estoque: quantidade disponível em estoque (não pode ser negativa)
 - tipo: define se o produto é próprio ou consignado ('proprio' ou 'consignado')
 
+Campos adicionais:
+- tipo_repasse: define se o repasse é por 'porcentagem' ou 'fixo'
+- porcentagem_repasse: percentual aplicado na venda (quando aplicável)
+- valor_custo: valor fixo do produto para o artesão (quando aplicável)
+
 Regras:
 - Não permite valores negativos para preço e estoque
-- O tipo do produto é limitado a valores válidos para evitar inconsistências
+- O tipo do produto é limitado a valores válidos
+- Produtos consignados podem utilizar apenas um tipo de repasse (porcentagem ou fixo)
 
 ---
 
