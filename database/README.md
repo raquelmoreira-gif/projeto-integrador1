@@ -11,7 +11,11 @@ Campos principais:
 - data: data do caixa
 - valor_inicial: valor de troco inicial
 - valor_final: valor ao fechar o caixa
-- status: aberto ou fechado
+- status: indica se o caixa está 'aberto' ou 'fechado'
+
+Regras:
+- Apenas um caixa pode ser aberto por dia
+- O status do caixa é limitado a 'aberto' ou 'fechado'
 
 ---
 
