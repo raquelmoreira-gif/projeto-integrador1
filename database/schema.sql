@@ -37,3 +37,28 @@ CREATE TABLE produtos (
   tipo TEXT NOT NULL CHECK (tipo IN ('proprio', 'consignado')),
   criado_em TIMESTAMP DEFAULT NOW()
 );
+-----------------------------------------------------------
+-- TABELA: vendas_itens
+-- registra os produtos dentro de cada venda
+
+CREATE TABLE vendas_itens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  venda_id UUID NOT NULL,
+  produto_id UUID NOT NULL,
+  quantidade INTEGER NOT NULL CHECK (quantidade > 0),
+  preco_unitario NUMERIC(10,2) NOT NULL CHECK (preco_unitario >= 0), 
+  subtotal NUMERIC(10,2) NOT NULL CHECK (subtotal >= 0),
+  criado_em TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT fk_venda
+    FOREIGN KEY (venda_id)
+    REFERENCES vendas(id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_produto
+    FOREIGN KEY (produto_id)
+    REFERENCES produtos(id)
+);
+-- evita produto repetido na mesma venda
+CREATE UNIQUE INDEX unique_venda_produto 
+ON vendas_itens (venda_id, produto_id);
+------------------------------------------------------
+
