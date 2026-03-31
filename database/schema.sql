@@ -8,7 +8,8 @@ CREATE TABLE caixa (
   valor_final NUMERIC(10,2),
   aberto_em TIMESTAMP DEFAULT NOW(),
   fechado_em TIMESTAMP,
-  status TEXT DEFAULT 'aberto'
+  status TEXT NOT NULL DEFAULT 'aberto'
+CHECK (status IN ('aberto', 'fechado'))
 );
 -- impede mais de um caixa no mesmo dia
 CREATE UNIQUE INDEX unique_caixa_data 
