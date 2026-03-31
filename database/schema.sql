@@ -10,6 +10,9 @@ CREATE TABLE caixa (
   fechado_em TIMESTAMP,
   status TEXT DEFAULT 'aberto'
 );
+-- impede mais de um caixa no mesmo dia
+CREATE UNIQUE INDEX unique_caixa_data 
+ON caixa (data);
 -----------------------------------------------------
 -- TABELA: vendas
 -- registra cada venda realizada no caixa
