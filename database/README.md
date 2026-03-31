@@ -16,6 +16,7 @@ Campos principais:
 Regras:
 - Apenas um caixa pode ser aberto por dia
 - O status do caixa é limitado a 'aberto' ou 'fechado'
+- Não é possível fechar o caixa sem informar o valor final
 
 ---
 
