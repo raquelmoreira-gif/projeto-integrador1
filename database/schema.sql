@@ -1,4 +1,3 @@
-assim?
 -- TABELA: caixa
 -- controla abertura e fechamento diário
 
