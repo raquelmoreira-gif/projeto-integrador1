@@ -85,6 +85,10 @@ CREATE TABLE vendas (
     ON DELETE CASCADE
 );
 
+ALTER TABLE vendas
+ADD COLUMN status TEXT NOT NULL DEFAULT 'pendente'
+CHECK (status IN ('pendente', 'paga', 'cancelada'));
+
 --------------------------------------------------------
 
 -- =========================================
