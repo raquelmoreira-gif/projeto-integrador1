@@ -276,3 +276,32 @@ CREATE TRIGGER trigger_devolver_estoque
 AFTER DELETE ON vendas_itens
 FOR EACH ROW
 EXECUTE FUNCTION devolver_estoque();
+-------------------------------------------------------
+
+-- ajusta estoque ao editar item da venda
+CREATE OR REPLACE FUNCTION atualizar_estoque()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- devolve quantidade antiga
+  UPDATE produtos
+  SET quantidade_estoque = quantidade_estoque + OLD.quantidade
+  WHERE id = OLD.produto_id;
+
+  -- valida novo estoque
+  IF (SELECT quantidade_estoque FROM produtos WHERE id = NEW.produto_id) < NEW.quantidade THEN
+    RAISE EXCEPTION 'Estoque insuficiente para atualização';
+  END IF;
+
+  -- baixa nova quantidade
+  UPDATE produtos
+  SET quantidade_estoque = quantidade_estoque - NEW.quantidade
+  WHERE id = NEW.produto_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_atualizar_estoque
+BEFORE UPDATE ON vendas_itens
+FOR EACH ROW
+EXECUTE FUNCTION atualizar_estoque();
