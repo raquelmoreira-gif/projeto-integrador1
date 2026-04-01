@@ -41,6 +41,25 @@ CHECK (
 );
 
 --------------------------------------------------------
+-- =========================================
+-- TABELA: usuarios
+-- controla acesso ao sistema
+-- =========================================
+
+CREATE TABLE usuarios (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  nome TEXT NOT NULL,
+
+  email TEXT UNIQUE NOT NULL,
+
+  senha TEXT NOT NULL,
+
+  tipo TEXT NOT NULL CHECK (tipo IN ('admin', 'suporte')),
+
+  criado_em TIMESTAMP DEFAULT NOW()
+);
+--------------------------------------------------------
 
 -- =========================================
 -- TABELA: vendas
@@ -281,18 +300,28 @@ EXECUTE FUNCTION devolver_estoque();
 -- ajusta estoque ao editar item da venda
 CREATE OR REPLACE FUNCTION atualizar_estoque()
 RETURNS TRIGGER AS $$
+DECLARE
+  estoque_atual INTEGER;
 BEGIN
-  -- devolve quantidade antiga
+  -- devolve estoque do produto antigo
   UPDATE produtos
   SET quantidade_estoque = quantidade_estoque + OLD.quantidade
   WHERE id = OLD.produto_id;
 
-  -- valida novo estoque
-  IF (SELECT quantidade_estoque FROM produtos WHERE id = NEW.produto_id) < NEW.quantidade THEN
+  -- pega estoque atual do novo produto
+  SELECT quantidade_estoque INTO estoque_atual
+  FROM produtos
+  WHERE id = NEW.produto_id;
+
+  IF estoque_atual IS NULL THEN
+    RAISE EXCEPTION 'Produto não encontrado';
+  END IF;
+
+  IF estoque_atual < NEW.quantidade THEN
     RAISE EXCEPTION 'Estoque insuficiente para atualização';
   END IF;
 
-  -- baixa nova quantidade
+  -- baixa no novo produto
   UPDATE produtos
   SET quantidade_estoque = quantidade_estoque - NEW.quantidade
   WHERE id = NEW.produto_id;
