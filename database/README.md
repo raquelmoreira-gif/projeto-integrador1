@@ -129,6 +129,15 @@ Campos principais:
 
 ---
 
+## ⚙️ Automatizações do Sistema
+
+- Validação de estoque antes da venda
+- Baixa automática de estoque ao registrar venda
+- Devolução automática ao cancelar itens
+- Ajuste automático ao editar itens da venda
+
+---
+
 ## Relacionamentos
 
 - Cada venda está vinculada a um caixa
