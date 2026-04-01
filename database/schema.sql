@@ -252,9 +252,11 @@ for each row
 execute function atualizar_estoque();
 
 -- =========================================
--- VIEW: RELATÓRIO DE CAIXA
+-- VIEWS: RELATÓRIOS
 -- =========================================
-create view relatorio_caixa as
+
+-- 💰 RELATÓRIO DE CAIXA
+create or replace view relatorio_caixa as
 select
   c.id as caixa_id,
   c.data,
@@ -267,3 +269,65 @@ from caixa c
 left join vendas v 
   on v.caixa_id = c.id and v.status = 'paga'
 group by c.id, c.data;
+
+--------------------------------------------------------
+
+-- 🛍️ PRODUTOS MAIS VENDIDOS
+create or replace view relatorio_vendas_produto as
+select
+  p.id,
+  p.nome,
+  sum(vi.quantidade) as total_vendido,
+  sum(vi.subtotal) as faturamento
+from vendas_itens vi
+join produtos p on p.id = vi.produto_id
+join vendas v on v.id = vi.venda_id
+where v.status = 'paga'
+group by p.id, p.nome;
+
+--------------------------------------------------------
+
+-- 📅 VENDAS POR DIA
+create or replace view relatorio_vendas_dia as
+select
+  date(v.criado_em) as data,
+  count(v.id) as quantidade_vendas,
+  sum(v.valor_total) as total_vendido
+from vendas v
+where v.status = 'paga'
+group by date(v.criado_em);
+
+--------------------------------------------------------
+
+-- 📦 ESTOQUE ATUAL
+create or replace view relatorio_estoque as
+select
+  id,
+  nome,
+  quantidade_estoque
+from produtos;
+
+--------------------------------------------------------
+
+-- ⚠️ ESTOQUE BAIXO
+create or replace view relatorio_estoque_baixo as
+select *
+from produtos
+where quantidade_estoque <= 2;
+
+--------------------------------------------------------
+
+-- 🎨 CONSIGNADO POR ARTESÃO
+create or replace view relatorio_consignado as
+select
+  a.nome as artesao,
+  p.nome as produto,
+  sum(vi.quantidade) as vendido,
+  sum(vi.subtotal) as faturamento
+from vendas_itens vi
+join produtos p on p.id = vi.produto_id
+join artesaos a on a.id = p.artesao_id
+join vendas v on v.id = vi.venda_id
+where v.status = 'paga'
+  and p.tipo = 'consignado'
+group by a.nome, p.nome;
