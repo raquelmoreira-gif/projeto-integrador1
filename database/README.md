@@ -21,6 +21,21 @@ Regras:
 
 ---
 
+### 👤 usuarios
+Controla o acesso ao sistema.
+
+Campos principais:
+- nome: nome do usuário
+- email: login (único)
+- senha: senha criptografada
+- tipo: nível de acesso ('admin' ou 'suporte')
+
+Regras:
+- Email deve ser único
+- Tipos de acesso definidos por perfil
+
+---
+
 ### 💰 vendas
 Registra as vendas realizadas no caixa.
 
@@ -91,7 +106,7 @@ Automação de estoque:
 - O sistema valida automaticamente se há estoque suficiente antes da venda
 - O estoque é reduzido automaticamente ao registrar a venda
 - Ao remover um item da venda, o estoque é devolvido automaticamente
-- Ao editar a quantidade de um item da venda, o estoque é ajustado automaticamente
+- Ao editar a quantidade ou o produto de um item da venda, o estoque é ajustado automaticamente
 
 ---
 
