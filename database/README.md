@@ -1,147 +1,247 @@
-# Banco de Dados
+# 🗄️ Banco de Dados
 
-Estrutura do banco de dados do sistema de controle de caixa.
+Estrutura do banco de dados do sistema de controle de caixa e estoque da aplicação.
 
-## Tabelas
+O banco foi modelado com foco em **integridade dos dados, automação de processos e consistência das operações**, utilizando PostgreSQL via Supabase.
+
+---
+
+## 📊 Visão Geral
+
+O sistema permite:
+
+- Abertura e fechamento de caixa
+- Registro de vendas com múltiplos itens
+- Controle automático de estoque
+- Gestão de produtos próprios e consignados
+- Registro de movimentações de estoque
+- Geração de relatórios de vendas
+
+---
+
+## 🧾 Tabelas
 
 ### 🧾 caixa
 Responsável por controlar a abertura e fechamento do caixa diário.
 
-Campos principais:
+**Campos principais:**
 - data: data do caixa
 - valor_inicial: valor de troco inicial
 - valor_final: valor ao fechar o caixa
 - status: indica se o caixa está 'aberto' ou 'fechado'
 
-Regras:
+**Regras:**
 - Apenas um caixa pode ser aberto por dia
 - Apenas um caixa pode estar aberto por vez
-- O status do caixa é limitado a 'aberto' ou 'fechado'
 - Não é possível fechar o caixa sem informar o valor final
+- Controle de consistência garantido por constraint no banco
 
 ---
 
 ### 👤 usuarios
 Controla o acesso ao sistema.
 
-Campos principais:
-- nome: nome do usuário
-- email: login (único)
-- senha: senha criptografada
-- tipo: nível de acesso ('admin' ou 'suporte')
+**Campos principais:**
+- nome
+- email (único)
+- senha
+- tipo ('admin' ou 'suporte')
 
-Regras:
-- Email deve ser único
-- Tipos de acesso definidos por perfil
+**Regras:**
+- Email único
+- Controle de acesso por perfil
 
 ---
 
 ### 💰 vendas
 Registra as vendas realizadas no caixa.
 
-Campos principais:
-- caixa_id: referência ao caixa
-- valor: valor da venda
-- forma_pagamento: tipo de pagamento (pix, dinheiro, crédito, débito)
-- criado_em: data e hora da venda
+**Campos principais:**
+- caixa_id
+- usuario_id
+- valor_total
+- forma_pagamento ('dinheiro', 'pix', 'cartao')
+- status ('pendente', 'paga', 'cancelada')
+- criado_em
 
-Campos adicionais:
-- status: controla o estado da venda ('pendente', 'paga', 'cancelada')
-
-Regras:
-- O sistema registra a venda como concluída no momento do lançamento
-- O estoque é atualizado automaticamente ao registrar os itens da venda
-- Vendas canceladas devem ter seus efeitos revertidos no estoque
-- O campo status permite evolução futura para controle de pagamento
-
----
-
-### 📦 produtos
-Armazena os produtos disponíveis para venda.
-
-Campos principais:
-- nome: nome do produto
-- preco: valor de venda (não pode ser negativo)
-- quantidade_estoque: quantidade disponível em estoque (não pode ser negativa)
-- tipo: define se o produto é próprio ou consignado ('proprio' ou 'consignado')
-
-Campos adicionais:
-- tipo_repasse: define se o repasse é por 'porcentagem' ou 'fixo'
-- porcentagem_repasse: percentual aplicado na venda (quando aplicável)
-- valor_custo: valor fixo do produto para o artesão (quando aplicável)
-
-Regras:
-- Não permite valores negativos para preço e estoque
-- O tipo do produto é limitado a valores válidos
-- Produtos consignados podem utilizar apenas um tipo de repasse (porcentagem ou fixo)
-- Produtos próprios não utilizam repasse
-- O estoque pode chegar a zero, mas não pode ser negativo
-
----
-
-### 📦 movimentacoes_estoque
-Registra todas as entradas e saídas de produtos no estoque.
-
-Campos principais:
-- produto_id: referência ao produto
-- tipo: define se é 'entrada' ou 'saida'
-- quantidade: quantidade movimentada
-- motivo: motivo da movimentação (compra, venda, ajuste, devolução)
-- criado_em: data e hora da movimentação
-
-Regras:
-- Quantidade deve ser maior que zero
-- Tipo limitado a 'entrada' ou 'saida'
-- Não altera diretamente o estoque, apenas registra o histórico
+**Regras:**
+- Cada venda pertence a um caixa
+- Vendas possuem controle de status
+- Estrutura preparada para evolução futura de pagamento
 
 ---
 
 ### 🧩 vendas_itens
 Relaciona produtos às vendas.
 
-Campos principais:
-- venda_id: referência à venda
-- produto_id: referência ao produto
-- quantidade: quantidade vendida
-- preco_unitario: valor no momento da venda
-- subtotal: valor total do item
+**Campos principais:**
+- venda_id
+- produto_id
+- quantidade
+- preco_unitario
+- subtotal
 
-Regras:
+**Regras:**
 - Não permite valores negativos
-- Quantidade deve ser maior que zero
 - Um produto não pode ser repetido na mesma venda
+- Integridade garantida por chave única (venda + produto)
 
-Automação de estoque:
-- O sistema valida automaticamente se há estoque suficiente antes da venda
-- O estoque é reduzido automaticamente ao registrar a venda
-- Ao remover um item da venda, o estoque é devolvido automaticamente
-- Ao editar a quantidade ou o produto de um item da venda, o estoque é ajustado automaticamente
+**Automação de estoque:**
+- Validação automática antes da venda
+- Baixa automática ao inserir item
+- Devolução automática ao remover item
+- Ajuste automático ao editar item
+
+---
+
+### 📦 produtos
+Armazena os produtos disponíveis para venda.
+
+**Campos principais:**
+- nome
+- preco
+- quantidade_estoque
+- tipo ('proprio' ou 'consignado')
+
+**Campos adicionais:**
+- artesao_id
+- tipo_repasse ('porcentagem' ou 'fixo')
+- porcentagem_repasse
+- valor_custo
+
+**Regras:**
+- Não permite valores negativos
+- Produtos consignados possuem regras de repasse
+- Produtos próprios não utilizam repasse
 
 ---
 
 ### 🧑‍🎨 artesaos
 Armazena os fornecedores de produtos consignados.
 
-Campos principais:
-- nome: nome do artesão
-- telefone: contato
-- email: contato
+**Campos principais:**
+- nome
+- telefone
+- email
 
 ---
 
-## ⚙️ Automatizações do Sistema
+### 📦 movimentacoes_estoque
+Registra entradas e saídas de produtos.
+
+**Campos principais:**
+- produto_id
+- tipo ('entrada', 'saida')
+- quantidade
+- motivo
+- criado_em
+
+**Regras:**
+- Apenas registra histórico (não altera diretamente o estoque)
+- Quantidade sempre positiva
+
+---
+
+## 🔗 Relacionamentos
+
+- Um caixa possui várias vendas
+- Uma venda pertence a um usuário
+- Uma venda possui vários itens
+- Um item pertence a um produto
+- Produtos podem ter movimentações de estoque
+- Produtos consignados podem estar vinculados a artesãos
+
+---
+
+## ⚙️ Regras de Negócio Implementadas no Banco
+
+O sistema utiliza **constraints e triggers** para garantir integridade:
 
 - Validação de estoque antes da venda
-- Baixa automática de estoque ao registrar venda
-- Devolução automática ao cancelar itens
-- Ajuste automático ao editar itens da venda
+- Baixa automática de estoque
+- Devolução automática ao remover itens
+- Atualização automática ao editar itens
+- Controle de consistência do caixa
 
 ---
 
-## Relacionamentos
+## 📊 Relatórios
 
-- Cada venda está vinculada a um caixa
-- Um caixa pode ter várias vendas
-- Cada venda pode conter vários produtos (vendas_itens)
-- Produtos podem possuir múltiplas movimentações de estoque
-- Produtos consignados podem estar vinculados a um artesão através do campo `artesao_id`
+Os relatórios do sistema foram estruturados como **views no banco de dados**, permitindo consultas rápidas, reutilizáveis e independentes da aplicação.
+
+### 💰 Relatório de Caixa
+View: `relatorio_caixa`
+
+- Total vendido
+- Quantidade de vendas
+- Totais por forma de pagamento
+
+---
+
+### 🛍️ Relatórios de Vendas
+
+#### Produtos mais vendidos
+View: `relatorio_vendas_produto`
+
+- Quantidade vendida por produto
+- Faturamento por produto
+
+#### Vendas por dia
+View: `relatorio_vendas_dia`
+
+- Total vendido por data
+- Quantidade de vendas por dia
+
+---
+
+### 📦 Relatórios de Estoque
+
+#### Estoque atual
+View: `relatorio_estoque`
+
+- Lista de produtos e quantidades disponíveis
+
+#### Estoque baixo
+View: `relatorio_estoque_baixo`
+
+- Produtos com quantidade crítica (<= 2)
+
+---
+
+### 🎨 Relatório de Consignado
+
+View: `relatorio_consignado`
+
+- Total vendido por artesão
+- Faturamento por produto consignado
+
+---
+
+## 🧠 Arquitetura dos Relatórios
+
+Os relatórios foram implementados diretamente no banco de dados utilizando **views**, garantindo:
+
+- Padronização das consultas
+- Melhor desempenho
+- Reutilização no sistema
+- Independência da camada de aplicação
+
+---
+
+## 🚀 Tecnologias
+
+- PostgreSQL
+- Supabase
+
+---
+
+## 🧠 Considerações Técnicas
+
+O banco foi projetado para:
+
+- Reduzir dependência da aplicação
+- Garantir consistência dos dados
+- Automatizar processos críticos
+- Facilitar geração de relatórios
+
+A lógica de negócio principal foi implementada diretamente no banco de dados, aumentando a confiabilidade do sistema.
