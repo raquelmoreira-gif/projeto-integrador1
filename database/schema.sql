@@ -1,37 +1,20 @@
 -- =========================================
 -- TABELA: caixa
--- controla abertura e fechamento diário
 -- =========================================
 CREATE TABLE caixa (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  -- data do caixa (1 por dia)
   data DATE NOT NULL,
-
-  -- valor inicial (troco)
   valor_inicial NUMERIC(10,2) NOT NULL,
-
-  -- valor ao fechar (só existe quando fecha)
   valor_final NUMERIC(10,2),
-
   aberto_em TIMESTAMP DEFAULT NOW(),
   fechado_em TIMESTAMP,
-
-  -- status do caixa
   status TEXT NOT NULL DEFAULT 'aberto'
     CHECK (status IN ('aberto', 'fechado'))
 );
 
--- regra: só um caixa por dia
-CREATE UNIQUE INDEX unique_caixa_data 
-ON caixa (data);
+CREATE UNIQUE INDEX unique_caixa_data ON caixa (data);
+CREATE UNIQUE INDEX unique_caixa_aberto ON caixa (status) WHERE status = 'aberto';
 
--- regra: só um caixa aberto por vez
-CREATE UNIQUE INDEX unique_caixa_aberto 
-ON caixa (status)
-WHERE status = 'aberto';
-
--- regra: não pode fechar sem valor_final
 ALTER TABLE caixa
 ADD CONSTRAINT chk_caixa_fechamento
 CHECK (
@@ -41,74 +24,49 @@ CHECK (
 );
 
 --------------------------------------------------------
+
 -- =========================================
 -- TABELA: usuarios
--- controla acesso ao sistema
 -- =========================================
-
 CREATE TABLE usuarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
   nome TEXT NOT NULL,
-
   email TEXT UNIQUE NOT NULL,
-
   senha TEXT NOT NULL,
-
   tipo TEXT NOT NULL CHECK (tipo IN ('admin', 'suporte')),
-
   criado_em TIMESTAMP DEFAULT NOW()
 );
+
 --------------------------------------------------------
 
 -- =========================================
 -- TABELA: vendas
--- registra cada venda dentro do caixa
 -- =========================================
 CREATE TABLE vendas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  -- vínculo com o caixa
   caixa_id UUID NOT NULL,
-
-  -- valor total da venda
   valor NUMERIC(10,2) NOT NULL,
-
-  -- forma de pagamento
   forma_pagamento TEXT NOT NULL,
-
+  status TEXT NOT NULL DEFAULT 'pendente'
+    CHECK (status IN ('pendente', 'paga', 'cancelada')),
   criado_em TIMESTAMP DEFAULT NOW(),
-
   CONSTRAINT fk_caixa
     FOREIGN KEY (caixa_id)
     REFERENCES caixa(id)
     ON DELETE CASCADE
 );
 
-ALTER TABLE vendas
-ADD COLUMN status TEXT NOT NULL DEFAULT 'pendente'
-CHECK (status IN ('pendente', 'paga', 'cancelada'));
-
 --------------------------------------------------------
 
 -- =========================================
 -- TABELA: produtos
--- cadastro de itens vendidos
 -- =========================================
 CREATE TABLE produtos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
   nome TEXT NOT NULL,
-
-  -- preço de venda
   preco NUMERIC(10,2) NOT NULL CHECK (preco >= 0),
-
-  -- estoque atual
   quantidade_estoque INTEGER DEFAULT 0 CHECK (quantidade_estoque >= 0),
-
-  -- tipo do produto
   tipo TEXT NOT NULL CHECK (tipo IN ('proprio', 'consignado')),
-
   criado_em TIMESTAMP DEFAULT NOW()
 );
 
@@ -116,19 +74,15 @@ CREATE TABLE produtos (
 
 -- =========================================
 -- TABELA: artesaos
--- fornecedores de produtos consignados
 -- =========================================
 CREATE TABLE artesaos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
   nome TEXT NOT NULL,
   telefone TEXT,
   email TEXT,
-
   criado_em TIMESTAMP DEFAULT NOW()
 );
 
--- ligação produto → artesão
 ALTER TABLE produtos
 ADD COLUMN artesao_id UUID;
 
@@ -141,23 +95,14 @@ REFERENCES artesaos(id);
 
 -- =========================================
 -- TABELA: vendas_itens
--- itens dentro de cada venda
 -- =========================================
 CREATE TABLE vendas_itens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
   venda_id UUID NOT NULL,
   produto_id UUID NOT NULL,
-
-  -- quantidade vendida
   quantidade INTEGER NOT NULL CHECK (quantidade > 0),
-
-  -- preço no momento da venda
   preco_unitario NUMERIC(10,2) NOT NULL CHECK (preco_unitario >= 0),
-
-  -- total do item (quantidade x preço)
   subtotal NUMERIC(10,2) NOT NULL CHECK (subtotal >= 0),
-
   criado_em TIMESTAMP DEFAULT NOW(),
 
   CONSTRAINT fk_venda
@@ -170,7 +115,6 @@ CREATE TABLE vendas_itens (
     REFERENCES produtos(id)
 );
 
--- regra: não repetir produto na mesma venda
 CREATE UNIQUE INDEX unique_venda_produto 
 ON vendas_itens (venda_id, produto_id);
 
@@ -178,7 +122,6 @@ ON vendas_itens (venda_id, produto_id);
 
 -- =========================================
 -- ALTERAÇÕES: repasse consignado
--- define quanto o artesão recebe
 -- =========================================
 ALTER TABLE produtos
 ADD COLUMN tipo_repasse TEXT CHECK (tipo_repasse IN ('porcentagem', 'fixo'));
@@ -189,7 +132,6 @@ ADD COLUMN porcentagem_repasse NUMERIC(5,2);
 ALTER TABLE produtos
 ADD COLUMN valor_custo NUMERIC(10,2);
 
--- regra: só pode usar um tipo de repasse
 ALTER TABLE produtos
 ADD CONSTRAINT chk_repasse
 CHECK (
@@ -200,7 +142,6 @@ CHECK (
   (tipo_repasse IS NULL)
 );
 
--- regra: produto próprio não usa repasse
 ALTER TABLE produtos
 ADD CONSTRAINT chk_repasse_tipo
 CHECK (
@@ -211,20 +152,13 @@ CHECK (
 
 -- =========================================
 -- TABELA: movimentacoes_estoque
--- histórico de entrada e saída de produtos
 -- =========================================
 CREATE TABLE movimentacoes_estoque (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
   produto_id UUID NOT NULL,
-
-  -- entrada ou saída
   tipo TEXT NOT NULL CHECK (tipo IN ('entrada', 'saida')),
-
   quantidade INTEGER NOT NULL CHECK (quantidade > 0),
-
   motivo TEXT,
-
   criado_em TIMESTAMP DEFAULT NOW(),
 
   CONSTRAINT fk_produto_movimentacao
@@ -236,10 +170,10 @@ CREATE TABLE movimentacoes_estoque (
 --------------------------------------------------------
 
 -- =========================================
--- TRIGGERS: controle automático de estoque
+-- TRIGGERS: CONTROLE DE ESTOQUE
 -- =========================================
 
--- valida estoque antes da venda
+-- valida estoque
 CREATE OR REPLACE FUNCTION validar_estoque()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -248,6 +182,10 @@ BEGIN
   SELECT quantidade_estoque INTO estoque_atual
   FROM produtos
   WHERE id = NEW.produto_id;
+
+  IF estoque_atual IS NULL THEN
+    RAISE EXCEPTION 'Produto não encontrado';
+  END IF;
 
   IF estoque_atual < NEW.quantidade THEN
     RAISE EXCEPTION 'Estoque insuficiente';
@@ -264,7 +202,7 @@ EXECUTE FUNCTION validar_estoque();
 
 --------------------------------------------------------
 
--- baixa estoque após venda
+-- baixa estoque
 CREATE OR REPLACE FUNCTION baixar_estoque()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -283,7 +221,7 @@ EXECUTE FUNCTION baixar_estoque();
 
 --------------------------------------------------------
 
--- devolve estoque ao cancelar venda
+-- devolve estoque
 CREATE OR REPLACE FUNCTION devolver_estoque()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -299,20 +237,19 @@ CREATE TRIGGER trigger_devolver_estoque
 AFTER DELETE ON vendas_itens
 FOR EACH ROW
 EXECUTE FUNCTION devolver_estoque();
--------------------------------------------------------
 
--- ajusta estoque ao editar item da venda
+--------------------------------------------------------
+
+-- atualiza estoque (UPDATE)
 CREATE OR REPLACE FUNCTION atualizar_estoque()
 RETURNS TRIGGER AS $$
 DECLARE
   estoque_atual INTEGER;
 BEGIN
-  -- devolve estoque do produto antigo
   UPDATE produtos
   SET quantidade_estoque = quantidade_estoque + OLD.quantidade
   WHERE id = OLD.produto_id;
 
-  -- pega estoque atual do novo produto
   SELECT quantidade_estoque INTO estoque_atual
   FROM produtos
   WHERE id = NEW.produto_id;
@@ -325,7 +262,6 @@ BEGIN
     RAISE EXCEPTION 'Estoque insuficiente para atualização';
   END IF;
 
-  -- baixa no novo produto
   UPDATE produtos
   SET quantidade_estoque = quantidade_estoque - NEW.quantidade
   WHERE id = NEW.produto_id;
