@@ -1,276 +1,269 @@
 -- =========================================
+-- EXTENSÕES
+-- =========================================
+create extension if not exists "pgcrypto";
+
+-- =========================================
 -- TABELA: caixa
 -- =========================================
-CREATE TABLE caixa (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  data DATE NOT NULL,
-  valor_inicial NUMERIC(10,2) NOT NULL,
-  valor_final NUMERIC(10,2),
-  aberto_em TIMESTAMP DEFAULT NOW(),
-  fechado_em TIMESTAMP,
-  status TEXT NOT NULL DEFAULT 'aberto'
-    CHECK (status IN ('aberto', 'fechado'))
+create table caixa (
+  id uuid primary key default gen_random_uuid(),
+  data date not null,
+  valor_inicial numeric(10,2) not null,
+  valor_final numeric(10,2),
+  aberto_em timestamp default now(),
+  fechado_em timestamp,
+  status text not null default 'aberto'
+    check (status in ('aberto', 'fechado'))
 );
 
-CREATE UNIQUE INDEX unique_caixa_data ON caixa (data);
-CREATE UNIQUE INDEX unique_caixa_aberto ON caixa (status) WHERE status = 'aberto';
+create unique index unique_caixa_data on caixa (data);
+create unique index unique_caixa_aberto on caixa (status) where status = 'aberto';
 
-ALTER TABLE caixa
-ADD CONSTRAINT chk_caixa_fechamento
-CHECK (
-  (status = 'aberto' AND valor_final IS NULL)
-  OR
-  (status = 'fechado' AND valor_final IS NOT NULL)
+alter table caixa
+add constraint chk_caixa_fechamento
+check (
+  (status = 'aberto' and valor_final is null)
+  or
+  (status = 'fechado' and valor_final is not null)
 );
-
---------------------------------------------------------
 
 -- =========================================
 -- TABELA: usuarios
 -- =========================================
-CREATE TABLE usuarios (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  nome TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  senha TEXT NOT NULL,
-  tipo TEXT NOT NULL CHECK (tipo IN ('admin', 'suporte')),
-  criado_em TIMESTAMP DEFAULT NOW()
+create table usuarios (
+  id uuid primary key default gen_random_uuid(),
+  nome text not null,
+  email text unique not null,
+  senha text not null,
+  tipo text not null check (tipo in ('admin', 'suporte')),
+  criado_em timestamp default now()
 );
-
---------------------------------------------------------
-
--- =========================================
--- TABELA: vendas
--- =========================================
-CREATE TABLE vendas (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  caixa_id UUID NOT NULL,
-  valor NUMERIC(10,2) NOT NULL,
-  forma_pagamento TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pendente'
-    CHECK (status IN ('pendente', 'paga', 'cancelada')),
-  criado_em TIMESTAMP DEFAULT NOW(),
-  CONSTRAINT fk_caixa
-    FOREIGN KEY (caixa_id)
-    REFERENCES caixa(id)
-    ON DELETE CASCADE
-);
-
---------------------------------------------------------
-
--- =========================================
--- TABELA: produtos
--- =========================================
-CREATE TABLE produtos (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  nome TEXT NOT NULL,
-  preco NUMERIC(10,2) NOT NULL CHECK (preco >= 0),
-  quantidade_estoque INTEGER DEFAULT 0 CHECK (quantidade_estoque >= 0),
-  tipo TEXT NOT NULL CHECK (tipo IN ('proprio', 'consignado')),
-  criado_em TIMESTAMP DEFAULT NOW()
-);
-
---------------------------------------------------------
 
 -- =========================================
 -- TABELA: artesaos
 -- =========================================
-CREATE TABLE artesaos (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  nome TEXT NOT NULL,
-  telefone TEXT,
-  email TEXT,
-  criado_em TIMESTAMP DEFAULT NOW()
+create table artesaos (
+  id uuid primary key default gen_random_uuid(),
+  nome text not null,
+  telefone text,
+  email text,
+  criado_em timestamp default now()
 );
 
-ALTER TABLE produtos
-ADD COLUMN artesao_id UUID;
+-- =========================================
+-- TABELA: produtos
+-- =========================================
+create table produtos (
+  id uuid primary key default gen_random_uuid(),
+  nome text not null,
+  preco numeric(10,2) not null check (preco >= 0),
+  quantidade_estoque integer default 0 check (quantidade_estoque >= 0),
+  tipo text not null check (tipo in ('proprio', 'consignado')),
+  artesao_id uuid,
+  tipo_repasse text check (tipo_repasse in ('porcentagem', 'fixo')),
+  porcentagem_repasse numeric(5,2),
+  valor_custo numeric(10,2),
+  criado_em timestamp default now(),
 
-ALTER TABLE produtos
-ADD CONSTRAINT fk_artesao
-FOREIGN KEY (artesao_id)
-REFERENCES artesaos(id);
+  constraint fk_artesao
+    foreign key (artesao_id)
+    references artesaos(id),
 
---------------------------------------------------------
+  constraint chk_repasse
+  check (
+    (tipo_repasse = 'porcentagem' and porcentagem_repasse is not null and valor_custo is null)
+    or
+    (tipo_repasse = 'fixo' and valor_custo is not null and porcentagem_repasse is null)
+    or
+    (tipo_repasse is null)
+  ),
+
+  constraint chk_repasse_tipo
+  check (
+    tipo = 'consignado' or tipo_repasse is null
+  )
+);
+
+-- =========================================
+-- TABELA: vendas
+-- =========================================
+create table vendas (
+  id uuid primary key default gen_random_uuid(),
+  caixa_id uuid not null,
+  usuario_id uuid,
+  valor_total numeric(10,2) not null,
+  forma_pagamento text not null check (forma_pagamento in ('dinheiro','pix','cartao')),
+  status text not null default 'pendente'
+    check (status in ('pendente','paga','cancelada')),
+  criado_em timestamp default now(),
+
+  constraint fk_caixa
+    foreign key (caixa_id)
+    references caixa(id)
+    on delete cascade,
+
+  constraint fk_usuario_venda
+    foreign key (usuario_id)
+    references usuarios(id)
+);
+
+create index idx_vendas_caixa on vendas(caixa_id);
+create index idx_vendas_status on vendas(status);
 
 -- =========================================
 -- TABELA: vendas_itens
 -- =========================================
-CREATE TABLE vendas_itens (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  venda_id UUID NOT NULL,
-  produto_id UUID NOT NULL,
-  quantidade INTEGER NOT NULL CHECK (quantidade > 0),
-  preco_unitario NUMERIC(10,2) NOT NULL CHECK (preco_unitario >= 0),
-  subtotal NUMERIC(10,2) NOT NULL CHECK (subtotal >= 0),
-  criado_em TIMESTAMP DEFAULT NOW(),
+create table vendas_itens (
+  id uuid primary key default gen_random_uuid(),
+  venda_id uuid not null,
+  produto_id uuid not null,
+  quantidade integer not null check (quantidade > 0),
+  preco_unitario numeric(10,2) not null check (preco_unitario >= 0),
+  subtotal numeric(10,2) not null check (subtotal >= 0),
+  criado_em timestamp default now(),
 
-  CONSTRAINT fk_venda
-    FOREIGN KEY (venda_id)
-    REFERENCES vendas(id)
-    ON DELETE CASCADE,
+  constraint fk_venda
+    foreign key (venda_id)
+    references vendas(id)
+    on delete cascade,
 
-  CONSTRAINT fk_produto
-    FOREIGN KEY (produto_id)
-    REFERENCES produtos(id)
+  constraint fk_produto
+    foreign key (produto_id)
+    references produtos(id)
 );
 
-CREATE UNIQUE INDEX unique_venda_produto 
-ON vendas_itens (venda_id, produto_id);
+create unique index unique_venda_produto 
+on vendas_itens (venda_id, produto_id);
 
---------------------------------------------------------
-
--- =========================================
--- ALTERAÇÕES: repasse consignado
--- =========================================
-ALTER TABLE produtos
-ADD COLUMN tipo_repasse TEXT CHECK (tipo_repasse IN ('porcentagem', 'fixo'));
-
-ALTER TABLE produtos
-ADD COLUMN porcentagem_repasse NUMERIC(5,2);
-
-ALTER TABLE produtos
-ADD COLUMN valor_custo NUMERIC(10,2);
-
-ALTER TABLE produtos
-ADD CONSTRAINT chk_repasse
-CHECK (
-  (tipo_repasse = 'porcentagem' AND porcentagem_repasse IS NOT NULL AND valor_custo IS NULL)
-  OR
-  (tipo_repasse = 'fixo' AND valor_custo IS NOT NULL AND porcentagem_repasse IS NULL)
-  OR
-  (tipo_repasse IS NULL)
-);
-
-ALTER TABLE produtos
-ADD CONSTRAINT chk_repasse_tipo
-CHECK (
-  tipo = 'consignado' OR tipo_repasse IS NULL
-);
-
---------------------------------------------------------
+create index idx_itens_venda on vendas_itens(venda_id);
 
 -- =========================================
 -- TABELA: movimentacoes_estoque
 -- =========================================
-CREATE TABLE movimentacoes_estoque (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  produto_id UUID NOT NULL,
-  tipo TEXT NOT NULL CHECK (tipo IN ('entrada', 'saida')),
-  quantidade INTEGER NOT NULL CHECK (quantidade > 0),
-  motivo TEXT,
-  criado_em TIMESTAMP DEFAULT NOW(),
+create table movimentacoes_estoque (
+  id uuid primary key default gen_random_uuid(),
+  produto_id uuid not null,
+  tipo text not null check (tipo in ('entrada', 'saida')),
+  quantidade integer not null check (quantidade > 0),
+  motivo text,
+  criado_em timestamp default now(),
 
-  CONSTRAINT fk_produto_movimentacao
-    FOREIGN KEY (produto_id)
-    REFERENCES produtos(id)
-    ON DELETE CASCADE
+  constraint fk_produto_movimentacao
+    foreign key (produto_id)
+    references produtos(id)
+    on delete cascade
 );
-
---------------------------------------------------------
 
 -- =========================================
 -- TRIGGERS: CONTROLE DE ESTOQUE
 -- =========================================
 
 -- valida estoque
-CREATE OR REPLACE FUNCTION validar_estoque()
-RETURNS TRIGGER AS $$
-DECLARE
-  estoque_atual INTEGER;
-BEGIN
-  SELECT quantidade_estoque INTO estoque_atual
-  FROM produtos
-  WHERE id = NEW.produto_id;
+create or replace function validar_estoque()
+returns trigger as $$
+declare
+  estoque_atual integer;
+begin
+  select quantidade_estoque into estoque_atual
+  from produtos
+  where id = new.produto_id;
 
-  IF estoque_atual IS NULL THEN
-    RAISE EXCEPTION 'Produto não encontrado';
-  END IF;
+  if estoque_atual is null then
+    raise exception 'Produto não encontrado';
+  end if;
 
-  IF estoque_atual < NEW.quantidade THEN
-    RAISE EXCEPTION 'Estoque insuficiente';
-  END IF;
+  if estoque_atual < new.quantidade then
+    raise exception 'Estoque insuficiente';
+  end if;
 
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+  return new;
+end;
+$$ language plpgsql;
 
-CREATE TRIGGER trigger_validar_estoque
-BEFORE INSERT ON vendas_itens
-FOR EACH ROW
-EXECUTE FUNCTION validar_estoque();
-
---------------------------------------------------------
+create trigger trigger_validar_estoque
+before insert on vendas_itens
+for each row
+execute function validar_estoque();
 
 -- baixa estoque
-CREATE OR REPLACE FUNCTION baixar_estoque()
-RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE produtos
-  SET quantidade_estoque = quantidade_estoque - NEW.quantidade
-  WHERE id = NEW.produto_id;
+create or replace function baixar_estoque()
+returns trigger as $$
+begin
+  update produtos
+  set quantidade_estoque = quantidade_estoque - new.quantidade
+  where id = new.produto_id;
 
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+  return new;
+end;
+$$ language plpgsql;
 
-CREATE TRIGGER trigger_baixar_estoque
-AFTER INSERT ON vendas_itens
-FOR EACH ROW
-EXECUTE FUNCTION baixar_estoque();
-
---------------------------------------------------------
+create trigger trigger_baixar_estoque
+after insert on vendas_itens
+for each row
+execute function baixar_estoque();
 
 -- devolve estoque
-CREATE OR REPLACE FUNCTION devolver_estoque()
-RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE produtos
-  SET quantidade_estoque = quantidade_estoque + OLD.quantidade
-  WHERE id = OLD.produto_id;
+create or replace function devolver_estoque()
+returns trigger as $$
+begin
+  update produtos
+  set quantidade_estoque = quantidade_estoque + old.quantidade
+  where id = old.produto_id;
 
-  RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
+  return old;
+end;
+$$ language plpgsql;
 
-CREATE TRIGGER trigger_devolver_estoque
-AFTER DELETE ON vendas_itens
-FOR EACH ROW
-EXECUTE FUNCTION devolver_estoque();
+create trigger trigger_devolver_estoque
+after delete on vendas_itens
+for each row
+execute function devolver_estoque();
 
---------------------------------------------------------
+-- atualiza estoque
+create or replace function atualizar_estoque()
+returns trigger as $$
+declare
+  estoque_atual integer;
+begin
+  update produtos
+  set quantidade_estoque = quantidade_estoque + old.quantidade
+  where id = old.produto_id;
 
--- atualiza estoque (UPDATE)
-CREATE OR REPLACE FUNCTION atualizar_estoque()
-RETURNS TRIGGER AS $$
-DECLARE
-  estoque_atual INTEGER;
-BEGIN
-  UPDATE produtos
-  SET quantidade_estoque = quantidade_estoque + OLD.quantidade
-  WHERE id = OLD.produto_id;
+  select quantidade_estoque into estoque_atual
+  from produtos
+  where id = new.produto_id;
 
-  SELECT quantidade_estoque INTO estoque_atual
-  FROM produtos
-  WHERE id = NEW.produto_id;
+  if estoque_atual < new.quantidade then
+    raise exception 'Estoque insuficiente para atualização';
+  end if;
 
-  IF estoque_atual IS NULL THEN
-    RAISE EXCEPTION 'Produto não encontrado';
-  END IF;
+  update produtos
+  set quantidade_estoque = quantidade_estoque - new.quantidade
+  where id = new.produto_id;
 
-  IF estoque_atual < NEW.quantidade THEN
-    RAISE EXCEPTION 'Estoque insuficiente para atualização';
-  END IF;
+  return new;
+end;
+$$ language plpgsql;
 
-  UPDATE produtos
-  SET quantidade_estoque = quantidade_estoque - NEW.quantidade
-  WHERE id = NEW.produto_id;
+create trigger trigger_atualizar_estoque
+before update on vendas_itens
+for each row
+execute function atualizar_estoque();
 
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_atualizar_estoque
-BEFORE UPDATE ON vendas_itens
-FOR EACH ROW
-EXECUTE FUNCTION atualizar_estoque();
+-- =========================================
+-- VIEW: RELATÓRIO DE CAIXA
+-- =========================================
+create view relatorio_caixa as
+select
+  c.id as caixa_id,
+  c.data,
+  coalesce(sum(v.valor_total), 0) as total_vendido,
+  count(v.id) as quantidade_vendas,
+  coalesce(sum(case when v.forma_pagamento = 'dinheiro' then v.valor_total else 0 end), 0) as total_dinheiro,
+  coalesce(sum(case when v.forma_pagamento = 'pix' then v.valor_total else 0 end), 0) as total_pix,
+  coalesce(sum(case when v.forma_pagamento = 'cartao' then v.valor_total else 0 end), 0) as total_cartao
+from caixa c
+left join vendas v 
+  on v.caixa_id = c.id and v.status = 'paga'
+group by c.id, c.data;
