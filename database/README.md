@@ -167,12 +167,64 @@ O sistema utiliza **constraints e triggers** para garantir integridade:
 
 ## 📊 Relatórios
 
-Foi criada uma **view no banco de dados** para facilitar consultas:
+Os relatórios do sistema foram estruturados como **views no banco de dados**, permitindo consultas rápidas, reutilizáveis e independentes da aplicação.
 
-- `relatorio_caixa`
-  - Total vendido
-  - Quantidade de vendas
-  - Totais por forma de pagamento
+### 💰 Relatório de Caixa
+View: `relatorio_caixa`
+
+- Total vendido
+- Quantidade de vendas
+- Totais por forma de pagamento
+
+---
+
+### 🛍️ Relatórios de Vendas
+
+#### Produtos mais vendidos
+View: `relatorio_vendas_produto`
+
+- Quantidade vendida por produto
+- Faturamento por produto
+
+#### Vendas por dia
+View: `relatorio_vendas_dia`
+
+- Total vendido por data
+- Quantidade de vendas por dia
+
+---
+
+### 📦 Relatórios de Estoque
+
+#### Estoque atual
+View: `relatorio_estoque`
+
+- Lista de produtos e quantidades disponíveis
+
+#### Estoque baixo
+View: `relatorio_estoque_baixo`
+
+- Produtos com quantidade crítica (<= 2)
+
+---
+
+### 🎨 Relatório de Consignado
+
+View: `relatorio_consignado`
+
+- Total vendido por artesão
+- Faturamento por produto consignado
+
+---
+
+## 🧠 Arquitetura dos Relatórios
+
+Os relatórios foram implementados diretamente no banco de dados utilizando **views**, garantindo:
+
+- Padronização das consultas
+- Melhor desempenho
+- Reutilização no sistema
+- Independência da camada de aplicação
 
 ---
 
