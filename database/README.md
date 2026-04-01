@@ -86,8 +86,12 @@ Regras:
 - Não permite valores negativos
 - Quantidade deve ser maior que zero
 - Um produto não pode ser repetido na mesma venda
+
+Automação de estoque:
 - O sistema valida automaticamente se há estoque suficiente antes da venda
-- O estoque é atualizado automaticamente após a venda
+- O estoque é reduzido automaticamente ao registrar a venda
+- Ao remover um item da venda, o estoque é devolvido automaticamente
+- Ao editar a quantidade de um item da venda, o estoque é ajustado automaticamente
 
 ---
 
