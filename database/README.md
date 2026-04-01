@@ -45,6 +45,15 @@ Campos principais:
 - forma_pagamento: tipo de pagamento (pix, dinheiro, crédito, débito)
 - criado_em: data e hora da venda
 
+Campos adicionais:
+- status: controla o estado da venda ('pendente', 'paga', 'cancelada')
+
+Regras:
+- O sistema registra a venda como concluída no momento do lançamento
+- O estoque é atualizado automaticamente ao registrar os itens da venda
+- Vendas canceladas devem ter seus efeitos revertidos no estoque
+- O campo status permite evolução futura para controle de pagamento
+
 ---
 
 ### 📦 produtos
