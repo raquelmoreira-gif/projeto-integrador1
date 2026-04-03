@@ -1,0 +1,1 @@
+# Servicos compartilhados da aplicacao.
