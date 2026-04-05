@@ -9,7 +9,7 @@ create extension if not exists "pgcrypto";
 create table caixa (
   id uuid primary key default gen_random_uuid(),
   data date not null,
-  valor_inicial numeric(10,2) not null,
+  valor_inicial numeric(10,2) not null check (valor_inicial >= 0),
   valor_final numeric(10,2),
   aberto_em timestamp default now(),
   fechado_em timestamp,
@@ -23,9 +23,9 @@ create unique index unique_caixa_aberto on caixa (status) where status = 'aberto
 alter table caixa
 add constraint chk_caixa_fechamento
 check (
-  (status = 'aberto' and valor_final is null)
+  (status = 'aberto' and valor_final is null and fechado_em is null)
   or
-  (status = 'fechado' and valor_final is not null)
+  (status = 'fechado' and valor_final is not null and fechado_em is not null)
 );
 
 -- =========================================
