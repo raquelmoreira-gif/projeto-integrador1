@@ -91,8 +91,8 @@ create table produtos (
 create table vendas (
   id uuid primary key default gen_random_uuid(),
   caixa_id uuid not null,
-  usuario_id uuid,
-  valor_total numeric(10,2) not null,
+  usuario_id uuid not null,
+  valor_total numeric(10,2) not null check (valor_total >= 0),
   forma_pagamento text not null check (forma_pagamento in ('dinheiro','pix','debito', 'credito')),
   status text not null default 'pendente'
     check (status in ('pendente','paga','cancelada')),
@@ -261,10 +261,10 @@ select
   c.id as caixa_id,
   c.data,
   coalesce(sum(v.valor_total), 0) as total_vendido,
-  count(v.id) as quantidade_vendas,
+  count(distinct v.id) as quantidade_vendas,
   coalesce(sum(case when v.forma_pagamento = 'dinheiro' then v.valor_total else 0 end), 0) as total_dinheiro,
   coalesce(sum(case when v.forma_pagamento = 'pix' then v.valor_total else 0 end), 0) as total_pix,
-  coalesce(sum(case when v.forma_pagamento = 'cartao' then v.valor_total else 0 end), 0) as total_cartao
+  coalesce(sum(case when v.forma_pagamento in ('credito','debito') then v.valor_total else 0 end), 0) as total_cartao
 from caixa c
 left join vendas v 
   on v.caixa_id = c.id and v.status = 'paga'
