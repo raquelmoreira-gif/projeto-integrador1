@@ -93,7 +93,7 @@ create table vendas (
   caixa_id uuid not null,
   usuario_id uuid,
   valor_total numeric(10,2) not null,
-  forma_pagamento text not null check (forma_pagamento in ('dinheiro','pix','cartao')),
+  forma_pagamento text not null check (forma_pagamento in ('dinheiro','pix','debito', 'credito')),
   status text not null default 'pendente'
     check (status in ('pendente','paga','cancelada')),
   criado_em timestamp default now(),
@@ -130,11 +130,11 @@ create table vendas_itens (
 
   constraint fk_produto
     foreign key (produto_id)
-    references produtos(id)
-);
+    references produtos(id),
 
-create unique index unique_venda_produto 
-on vendas_itens (venda_id, produto_id);
+  constraint unique_venda_produto 
+    unique (venda_id, produto_id)
+);
 
 create index idx_itens_venda on vendas_itens(venda_id);
 
