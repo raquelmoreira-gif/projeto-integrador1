@@ -18,5 +18,7 @@ def create_app():
     app.register_blueprint(usuarios_bp)
     app.register_blueprint(vendas_bp)
     app.register_blueprint(relatorios_bp)
+   
+    print(app.url_map)
 
     return app

@@ -1,9 +1,29 @@
+from datetime import datetime, timezone
+from uuid import UUID
+
 from flask import Blueprint, request
 
 from app.services.responses import fail, ok
 from app.services.supabase_client import get_supabase
 
 caixa_bp = Blueprint("caixa", __name__, url_prefix="/api/caixa")
+
+
+def _non_negative_number(value, field_label: str):
+    try:
+        n = float(value)
+    except (TypeError, ValueError):
+        return None, f"{field_label} deve ser numerico"
+    if n < 0:
+        return None, f"{field_label} deve ser >= 0 (conforme restricao do banco)"
+    return n, None
+
+
+def _numeric(value, field_label: str):
+    try:
+        return float(value), None
+    except (TypeError, ValueError):
+        return None, f"{field_label} deve ser numerico"
 
 
 @caixa_bp.get("")
@@ -36,28 +56,43 @@ def abrir_caixa():
     if data is None or valor_inicial is None:
         return fail("Campos obrigatorios: data e valor_inicial", 422)
 
+    vi, err = _non_negative_number(valor_inicial, "valor_inicial")
+    if err:
+        return fail(err, 422)
+
     sb = get_supabase()
     result = (
         sb.table("caixa")
-        .insert({"data": data, "valor_inicial": valor_inicial, "status": "aberto"})
+        .insert({"data": data, "valor_inicial": vi, "status": "aberto"})
         .execute()
     )
     return ok(result.data, 201)
 
 
-@caixa_bp.post("/<int:caixa_id>/fechar")
-def fechar_caixa(caixa_id: int):
+@caixa_bp.post("/<uuid:caixa_id>/fechar")
+def fechar_caixa(caixa_id: UUID):
     body = request.get_json(silent=True) or {}
     valor_final = body.get("valor_final")
 
     if valor_final is None:
         return fail("Campo obrigatorio: valor_final", 422)
 
+    vf, err = _numeric(valor_final, "valor_final")
+    if err:
+        return fail(err, 422)
+
     sb = get_supabase()
+    fechado_em = datetime.now(timezone.utc).isoformat()
     result = (
         sb.table("caixa")
-        .update({"valor_final": valor_final, "status": "fechado"})
-        .eq("id", caixa_id)
+        .update(
+            {
+                "valor_final": vf,
+                "status": "fechado",
+                "fechado_em": fechado_em,
+            }
+        )
+        .eq("id", str(caixa_id))
         .eq("status", "aberto")
         .execute()
     )

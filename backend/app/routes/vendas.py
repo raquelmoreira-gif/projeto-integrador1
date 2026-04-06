@@ -1,9 +1,26 @@
+from uuid import UUID
+
 from flask import Blueprint, request
 
 from app.services.responses import fail, ok
 from app.services.supabase_client import get_supabase
 
 vendas_bp = Blueprint("vendas", __name__, url_prefix="/api/vendas")
+
+# Deve coincidir com check (forma_pagamento in (...)) no banco — não usar 'cartao'.
+FORMAS_PAGAMENTO = frozenset({"dinheiro", "pix", "debito", "credito"})
+
+
+def _required_present(body: dict, fields: list[str]) -> list[str]:
+    missing = []
+    for field in fields:
+        val = body.get(field)
+        if field == "itens":
+            if val is None:
+                missing.append(field)
+        elif val is None or (isinstance(val, str) and not val.strip()):
+            missing.append(field)
+    return missing
 
 
 @vendas_bp.get("")
@@ -22,9 +39,18 @@ def listar_vendas():
 def criar_venda():
     body = request.get_json(silent=True) or {}
     required = ["caixa_id", "usuario_id", "forma_pagamento", "itens"]
-    missing = [field for field in required if body.get(field) is None]
+    missing = _required_present(body, required)
     if missing:
         return fail(f"Campos obrigatorios ausentes: {', '.join(missing)}", 422)
+
+    forma = body["forma_pagamento"]
+    if isinstance(forma, str):
+        forma = forma.strip()
+    if forma not in FORMAS_PAGAMENTO:
+        return fail(
+            "forma_pagamento invalida; use: dinheiro, pix, debito ou credito",
+            422,
+        )
 
     itens = body.get("itens", [])
     if not itens:
@@ -41,7 +67,7 @@ def criar_venda():
             {
                 "caixa_id": body["caixa_id"],
                 "usuario_id": body["usuario_id"],
-                "forma_pagamento": body["forma_pagamento"],
+                "forma_pagamento": forma,
                 "status": body.get("status", "paga"),
                 "valor_total": valor_total,
             }
@@ -62,15 +88,20 @@ def criar_venda():
     return ok({"venda": venda, "itens": itens_result.data}, 201)
 
 
-@vendas_bp.patch("/<int:venda_id>/status")
-def atualizar_status_venda(venda_id: int):
+@vendas_bp.patch("/<uuid:venda_id>/status")
+def atualizar_status_venda(venda_id: UUID):
     body = request.get_json(silent=True) or {}
     status = body.get("status")
     if status not in ["pendente", "paga", "cancelada"]:
         return fail("Status invalido", 422)
 
     sb = get_supabase()
-    result = sb.table("vendas").update({"status": status}).eq("id", venda_id).execute()
+    result = (
+        sb.table("vendas")
+        .update({"status": status})
+        .eq("id", str(venda_id))
+        .execute()
+    )
     if not result.data:
         return fail("Venda nao encontrada", 404)
     return ok(result.data[0])

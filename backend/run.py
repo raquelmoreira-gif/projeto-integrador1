@@ -3,5 +3,9 @@ from app import create_app
 
 app = create_app()
 
+@app.get("/teste")
+def teste():
+    return {"msg": "FUNCIONOU"}
+    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))

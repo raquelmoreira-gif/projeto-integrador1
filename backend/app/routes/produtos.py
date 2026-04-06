@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from flask import Blueprint, request
 
 from app.services.responses import fail, ok
@@ -29,21 +31,21 @@ def criar_produto():
     return ok(result.data, 201)
 
 
-@produtos_bp.patch("/<int:produto_id>")
-def atualizar_produto(produto_id: int):
+@produtos_bp.patch("/<uuid:produto_id>")
+def atualizar_produto(produto_id: UUID):
     body = request.get_json(silent=True) or {}
     if not body:
         return fail("Nenhum dado para atualizar", 422)
 
     sb = get_supabase()
-    result = sb.table("produtos").update(body).eq("id", produto_id).execute()
+    result = sb.table("produtos").update(body).eq("id", str(produto_id)).execute()
     if not result.data:
         return fail("Produto nao encontrado", 404)
     return ok(result.data[0])
 
 
-@produtos_bp.post("/<int:produto_id>/movimentar")
-def movimentar_estoque(produto_id: int):
+@produtos_bp.post("/<uuid:produto_id>/movimentar")
+def movimentar_estoque(produto_id: UUID):
     body = request.get_json(silent=True) or {}
     tipo = body.get("tipo")
     quantidade = body.get("quantidade")
@@ -59,7 +61,7 @@ def movimentar_estoque(produto_id: int):
         sb.table("movimentacoes_estoque")
         .insert(
             {
-                "produto_id": produto_id,
+                "produto_id": str(produto_id),
                 "tipo": tipo,
                 "quantidade": quantidade,
                 "motivo": motivo,
