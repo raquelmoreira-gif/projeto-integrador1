@@ -17,7 +17,6 @@ create table caixa (
     check (status in ('aberto', 'fechado'))
 );
 
-create unique index unique_caixa_data on caixa (data);
 create unique index unique_caixa_aberto on caixa (status) where status = 'aberto';
 
 alter table caixa
