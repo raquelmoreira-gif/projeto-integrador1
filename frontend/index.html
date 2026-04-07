@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caixa - Bia Criativa</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <title>Bia Criativa</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="layout">
@@ -12,51 +12,64 @@
       <div class="logo">Bia Criativa</div>
 
       <nav class="menu">
-        <a href="../index.html">Dashboard</a>
-        <a href="#" class="active">Caixa</a>
-        <a href="vendas.html">Vendas</a>
-        <a href="produtos.html">Produtos</a>
-        <a href="relatorios.html">Relatórios</a>
+        <a href="#" class="active">Dashboard</a>
+        <a href="pages/caixa.html">Caixa</a>
+        <a href="pages/vendas.html">Vendas</a>
+        <a href="pages/produtos.html">Produtos</a>
+        <a href="pages/relatorios.html">Relatórios</a>
       </nav>
     </aside>
 
     <div class="content-area">
       <header class="header">
-        <h1>Caixa</h1>
+        <h1>Painel de Controle</h1>
       </header>
 
       <main class="main-content">
-
-        <!-- STATUS -->
         <section class="cards">
           <div class="card">
-            <p class="card-title">Status</p>
+            <p class="card-title">Caixa Atual</p>
             <h2>Aberto</h2>
+            <span class="card-info">Atualizado hoje</span>
           </div>
 
           <div class="card">
-            <p class="card-title">Total do Dia</p>
-            <h2>R$ 0,00</h2>
+            <p class="card-title">Total Vendido</p>
+            <h2>R$ 1.250,00</h2>
+            <span class="card-info">+8,5% desde ontem</span>
+          </div>
+
+          <div class="card">
+            <p class="card-title">Vendas</p>
+            <h2>12</h2>
+            <span class="card-info">+3 hoje</span>
+          </div>
+
+          <div class="card">
+            <p class="card-title">Ticket Médio</p>
+            <h2>R$ 104,17</h2>
+            <span class="card-info">Resumo do dia</span>
           </div>
         </section>
 
-        <!-- ABERTURA -->
         <section class="panel">
           <h2>Abertura de Caixa</h2>
-          <input type="date">
-          <input type="number" placeholder="Valor inicial">
-          <button>Abrir Caixa</button>
+          <input type="date" id="dataCaixa">
+          <input type="number" id="valorInicial" placeholder="Valor inicial">
+          <button id="btnAbrirCaixa">Abrir Caixa</button>
+          <p id="mensagem"></p>
         </section>
 
-        <!-- FECHAMENTO -->
         <section class="panel">
-          <h2>Fechamento de Caixa</h2>
-          <input type="number" placeholder="Valor final">
-          <button>Fechar Caixa</button>
+          <h2>Produtos</h2>
+          <button id="btnCarregarProdutos">Carregar Produtos</button>
+          <div id="listaProdutos"></div>
         </section>
-
       </main>
     </div>
   </div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 </html>
