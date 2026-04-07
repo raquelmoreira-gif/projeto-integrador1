@@ -6,6 +6,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const dataCaixa = document.getElementById("dataCaixa");
   const valorInicial = document.getElementById("valorInicial");
 
+  // 🔹 Verifica se já existe caixa aberto ao carregar
+  if (mensagem) {
+    buscarCaixaAberto()
+      .then((res) => {
+        if (res && res.data) {
+          mensagem.textContent = "Já existe um caixa aberto.";
+        }
+      })
+      .catch(() => {
+        // ignora erro por enquanto
+      });
+  }
+
+  // 🔹 Abrir caixa
   if (btnAbrirCaixa) {
     btnAbrirCaixa.addEventListener("click", async () => {
       try {
@@ -19,7 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const resposta = await abrirCaixa(data, valor);
 
-        mensagem.textContent = resposta.message || resposta.msg || "Caixa aberto com sucesso!";
+        mensagem.textContent =
+          resposta.message ||
+          resposta.msg ||
+          "Caixa aberto com sucesso!";
       } catch (error) {
         mensagem.textContent = error.message;
       }
