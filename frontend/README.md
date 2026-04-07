@@ -30,6 +30,7 @@ frontend/
 ├── components/       # Componentes reutilizáveis
 ├── css/              # Estilos
 └── js/               # Scripts e integração com API
+
 ```bash
 ---
 
