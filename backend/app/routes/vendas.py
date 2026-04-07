@@ -1,3 +1,7 @@
+from flask import Blueprint, request
+
+vendas_bp = Blueprint("vendas", __name__, url_prefix="/api/vendas")
+
 @vendas_bp.post("")
 def criar_venda():
     body = request.get_json(silent=True) or {}
