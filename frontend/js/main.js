@@ -6,6 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const dataCaixa = document.getElementById("dataCaixa");
   const valorInicial = document.getElementById("valorInicial");
 
+    const hoje = new Date().toISOString().split("T")[0];
+
+  if (dataCaixa) {
+    dataCaixa.value = hoje;
+  }
+
   // 🔹 Verifica se já existe caixa aberto ao carregar
   if (mensagem) {
     buscarCaixaAberto()
