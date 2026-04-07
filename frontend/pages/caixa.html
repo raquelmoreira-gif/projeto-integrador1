@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caixa - Bia Criativa</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Bia Criativa</div>
 
+      <nav class="menu">
+        <a href="../index.html">Dashboard</a>
+        <a href="#" class="active">Caixa</a>
+        <a href="vendas.html">Vendas</a>
+        <a href="produtos.html">Produtos</a>
+        <a href="relatorios.html">Relatórios</a>
+      </nav>
+    </aside>
+
+    <div class="content-area">
+      <header class="header">
+        <h1>Caixa</h1>
+      </header>
+
+      <main class="main-content">
+
+        <!-- STATUS -->
+        <section class="cards">
+          <div class="card">
+            <p class="card-title">Status</p>
+            <h2>Aberto</h2>
+          </div>
+
+          <div class="card">
+            <p class="card-title">Total do Dia</p>
+            <h2>R$ 0,00</h2>
+          </div>
+        </section>
+
+        <!-- ABERTURA -->
+        <section class="panel">
+          <h2>Abertura de Caixa</h2>
+          <input type="date">
+          <input type="number" placeholder="Valor inicial">
+          <button>Abrir Caixa</button>
+        </section>
+
+        <!-- FECHAMENTO -->
+        <section class="panel">
+          <h2>Fechamento de Caixa</h2>
+          <input type="number" placeholder="Valor final">
+          <button>Fechar Caixa</button>
+        </section>
+
+      </main>
+    </div>
+  </div>
+</body>
+</html>
