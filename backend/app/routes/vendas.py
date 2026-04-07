@@ -34,6 +34,14 @@ def criar_venda():
 
     caixa_id = caixa_aberto.data[0]["id"]
 
+    # 🔒 BLOQUEIA PRODUTOS DUPLICADOS
+    produtos_vistos = set()
+    for item in itens:
+        produto_id = item.get("produto_id")
+        if produto_id in produtos_vistos:
+            return fail("Produto duplicado na venda", 422)
+        produtos_vistos.add(produto_id)
+
     # 🔥 BUSCA TODOS OS PRODUTOS DE UMA VEZ
     produto_ids = [item.get("produto_id") for item in itens if item.get("produto_id")]
 
