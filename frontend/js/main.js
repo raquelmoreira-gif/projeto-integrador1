@@ -9,6 +9,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCarregarProdutos = document.getElementById("btnCarregarProdutos");
   const listaProdutos = document.getElementById("listaProdutos");
 
+  const btnAdicionarProduto = document.getElementById("btnAdicionarProduto");
+  const listaVenda = document.getElementById("listaVenda");
+  const totalVenda = document.getElementById("totalVenda");
+  const qtdItensVenda = document.getElementById("qtdItensVenda");
+  const mensagemVenda = document.getElementById("mensagemVenda");
+
+  let itensVenda = [];
+  let total = 0;
+
   const hoje = new Date().toISOString().split("T")[0];
 
   if (dataCaixa) {
@@ -90,5 +99,55 @@ document.addEventListener("DOMContentLoaded", () => {
         listaProdutos.innerHTML = `<p>${error.message}</p>`;
       }
     });
+  }
+
+  if (btnAdicionarProduto) {
+    btnAdicionarProduto.addEventListener("click", () => {
+      const nome = document.getElementById("nomeProduto").value;
+      const quantidade = Number(document.getElementById("quantidadeProduto").value);
+      const preco = Number(document.getElementById("precoProduto").value);
+
+      if (!nome || !quantidade || !preco) {
+        if (mensagemVenda) {
+          mensagemVenda.textContent = "Preencha todos os campos do produto.";
+        }
+        return;
+      }
+
+      const subtotal = quantidade * preco;
+
+      itensVenda.push({ nome, quantidade, preco, subtotal });
+
+      renderizarVenda();
+    });
+  }
+
+  function renderizarVenda() {
+    if (!listaVenda || !totalVenda || !qtdItensVenda) return;
+
+    listaVenda.innerHTML = "";
+    total = 0;
+
+    itensVenda.forEach((item) => {
+      total += item.subtotal;
+
+      const div = document.createElement("div");
+      div.style.padding = "10px 0";
+      div.style.borderBottom = "1px solid #e0e0e0";
+
+      div.innerHTML = `
+        <strong>${item.nome}</strong><br>
+        ${item.quantidade} x R$ ${item.preco.toFixed(2)} = R$ ${item.subtotal.toFixed(2)}
+      `;
+
+      listaVenda.appendChild(div);
+    });
+
+    totalVenda.textContent = `R$ ${total.toFixed(2)}`;
+    qtdItensVenda.textContent = itensVenda.length;
+
+    if (mensagemVenda) {
+      mensagemVenda.textContent = "";
+    }
   }
 });
