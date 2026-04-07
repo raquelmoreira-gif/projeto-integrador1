@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produtos - Bia Criativa</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Bia Criativa</div>
 
+      <nav class="menu">
+        <a href="../index.html">Dashboard</a>
+        <a href="caixa.html">Caixa</a>
+        <a href="vendas.html">Vendas</a>
+        <a href="#" class="active">Produtos</a>
+        <a href="relatorios.html">Relatórios</a>
+      </nav>
+    </aside>
+
+    <div class="content-area">
+      <header class="header">
+        <h1>Produtos</h1>
+      </header>
+
+      <main class="main-content">
+        <section class="panel">
+          <h2>Lista de Produtos</h2>
+          <button id="btnCarregarProdutos">Carregar Produtos</button>
+          <div id="listaProdutos"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
