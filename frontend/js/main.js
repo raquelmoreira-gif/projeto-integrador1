@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const resposta = await abrirCaixa(data, valor);
 
-        mensagem.textContent = resposta.message || "Caixa aberto com sucesso!";
+        mensagem.textContent = resposta.message || resposta.msg || "Caixa aberto com sucesso!";
       } catch (error) {
         mensagem.textContent = error.message;
       }
