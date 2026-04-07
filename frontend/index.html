@@ -4,25 +4,68 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bia Criativa</title>
-
   <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Bia Criativa</div>
 
-  <div class="container">
-    <h1>Bia Criativa</h1>
-    <h2>Abertura de Caixa</h2>
+      <nav class="menu">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Caixa</a>
+        <a href="#">Vendas</a>
+        <a href="#">Produtos</a>
+        <a href="#">Relatórios</a>
+      </nav>
+    </aside>
 
-    <input type="date" id="dataCaixa">
-    <input type="number" id="valorInicial" placeholder="Valor inicial">
-    <button id="btnAbrirCaixa">Abrir Caixa</button>
+    <div class="content-area">
+      <header class="header">
+        <h1>Dashboard</h1>
+      </header>
 
-    <p id="mensagem"></p>
+      <main class="main-content">
+        <section class="cards">
+          <div class="card">
+            <p class="card-title">Caixa Atual</p>
+            <h2>Aberto</h2>
+            <span class="card-info">Atualizado hoje</span>
+          </div>
+
+          <div class="card">
+            <p class="card-title">Total Vendido</p>
+            <h2>R$ 1.250,00</h2>
+            <span class="card-info">+8,5% desde ontem</span>
+          </div>
+
+          <div class="card">
+            <p class="card-title">Vendas</p>
+            <h2>12</h2>
+            <span class="card-info">+3 hoje</span>
+          </div>
+
+          <div class="card">
+            <p class="card-title">Ticket Médio</p>
+            <h2>R$ 104,17</h2>
+            <span class="card-info">Resumo do dia</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Abertura de Caixa</h2>
+
+          <input type="date" id="dataCaixa">
+          <input type="number" id="valorInicial" placeholder="Valor inicial">
+          <button id="btnAbrirCaixa">Abrir Caixa</button>
+
+          <p id="mensagem"></p>
+        </section>
+      </main>
+    </div>
   </div>
 
   <script src="js/api.js"></script>
   <script src="js/main.js"></script>
-
 </body>
 </html>
