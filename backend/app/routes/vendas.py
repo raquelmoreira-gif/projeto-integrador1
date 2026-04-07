@@ -142,9 +142,20 @@ def atualizar_status_venda(venda_id: UUID):
 
     venda = venda_result.data[0]
 
-    # 🔒 NÃO PERMITE ALTERAR VENDA CANCELADA
     if venda["status"] == "cancelada":
         return fail("Venda já está cancelada", 400)
+
+    # 🔒 SE FOR CANCELAR → REMOVE ITENS (TRIGGER DEVOLVE ESTOQUE)
+    if status == "cancelada":
+        delete_result = (
+            sb.table("vendas_itens")
+            .delete()
+            .eq("venda_id", str(venda_id))
+            .execute()
+        )
+
+        if not delete_result:
+            return fail("Erro ao remover itens da venda", 500)
 
     result = (
         sb.table("vendas")
