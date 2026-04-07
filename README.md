@@ -99,13 +99,13 @@ Nesta fase, podem ocorrer:
 
 Projeto desenvolvido por alunas do curso de Ciência de Dados — UNIVESP.
 
-Camila Nascimento dos Santos
-Evelyn dos Santos Rofino
-Gabriela Naomi Espindola Sato
-Giovanna Clara Paes
-Marina Sousa Maida
-Raquel Moreira Ferreira
-Tamara da Costa e Silva
+* Camila Nascimento dos Santos
+* Evelyn dos Santos Rofino
+* Gabriela Naomi Espindola Sato
+* Giovanna Clara Paes
+* Marina Sousa Maida
+* Raquel Moreira Ferreira
+* Tamara da Costa e Silva
 
 ---
 
