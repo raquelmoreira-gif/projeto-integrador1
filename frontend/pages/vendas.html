@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendas - Bia Criativa</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Bia Criativa</div>
 
+      <nav class="menu">
+        <a href="../index.html">Dashboard</a>
+        <a href="caixa.html">Caixa</a>
+        <a href="#" class="active">Vendas</a>
+        <a href="produtos.html">Produtos</a>
+        <a href="relatorios.html">Relatórios</a>
+      </nav>
+    </aside>
+
+    <div class="content-area">
+      <header class="header">
+        <h1>Vendas</h1>
+      </header>
+
+      <main class="main-content">
+        <section class="cards">
+          <div class="card">
+            <p class="card-title">Itens na Venda</p>
+            <h2 id="qtdItensVenda">0</h2>
+            <span class="card-info">Produtos adicionados</span>
+          </div>
+
+          <div class="card">
+            <p class="card-title">Total da Venda</p>
+            <h2 id="totalVenda">R$ 0,00</h2>
+            <span class="card-info">Atualizado automaticamente</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Adicionar Produto</h2>
+
+          <input type="text" id="nomeProduto" placeholder="Nome do produto">
+          <input type="number" id="quantidadeProduto" placeholder="Quantidade">
+          <input type="number" id="precoProduto" placeholder="Preço unitário">
+
+          <button id="btnAdicionarProduto">Adicionar à Venda</button>
+        </section>
+
+        <section class="panel">
+          <h2>Itens da Venda</h2>
+          <div id="listaVenda"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Finalizar Venda</h2>
+
+          <select id="formaPagamento">
+            <option value="">Selecione a forma de pagamento</option>
+            <option value="dinheiro">Dinheiro</option>
+            <option value="pix">Pix</option>
+            <option value="debito">Débito</option>
+            <option value="credito">Crédito</option>
+          </select>
+
+          <button id="btnFinalizarVenda">Finalizar Venda</button>
+          <p id="mensagemVenda"></p>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
