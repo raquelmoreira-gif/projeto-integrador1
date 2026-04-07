@@ -61,9 +61,27 @@ def abrir_caixa():
         return fail(err, 422)
 
     sb = get_supabase()
+    
+    # VERIFICA SE JÁ TEM UM CAIXA ABERTO
+    caixa_aberto = (
+        sb.table("caixa")
+        .select("id")
+        .eq("status", "aberto")
+        .limit(1)
+        .execute()
+    )
+
+    if caixa_aberto.data:
+        return fail("Já existe um caixa aberto. Feche o atual antes de abrir outro.", 400)
+    
+    # ABRE O CAIXA    
     result = (
         sb.table("caixa")
-        .insert({"data": data, "valor_inicial": vi, "status": "aberto"})
+        .insert({
+            "data": data, 
+            "valor_inicial": vi, 
+            "status": "aberto"
+        })
         .execute()
     )
     return ok(result.data, 201)
