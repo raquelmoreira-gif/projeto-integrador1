@@ -26,37 +26,38 @@
       </header>
 
       <main class="main-content">
-
-        <!-- STATUS -->
         <section class="cards">
           <div class="card">
-            <p class="card-title">Status</p>
+            <p class="card-title">Status do Caixa</p>
             <h2>Aberto</h2>
+            <span class="card-info">Atualizado hoje</span>
           </div>
 
           <div class="card">
             <p class="card-title">Total do Dia</p>
             <h2>R$ 0,00</h2>
+            <span class="card-info">Resumo parcial</span>
           </div>
         </section>
 
-        <!-- ABERTURA -->
         <section class="panel">
           <h2>Abertura de Caixa</h2>
-          <input type="date">
-          <input type="number" placeholder="Valor inicial">
-          <button>Abrir Caixa</button>
+          <input type="date" id="dataCaixa">
+          <input type="number" id="valorInicial" placeholder="Valor inicial">
+          <button id="btnAbrirCaixa">Abrir Caixa</button>
+          <p id="mensagem"></p>
         </section>
 
-        <!-- FECHAMENTO -->
         <section class="panel">
           <h2>Fechamento de Caixa</h2>
           <input type="number" placeholder="Valor final">
           <button>Fechar Caixa</button>
         </section>
-
       </main>
     </div>
   </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
 </body>
 </html>
