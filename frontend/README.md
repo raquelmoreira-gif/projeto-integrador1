@@ -14,9 +14,9 @@ A aplicação está sendo construída com foco em simplicidade, organização e 
 
 ## 🛠️ Tecnologias Utilizadas
 
-- HTML5  
-- CSS3  
-- JavaScript (Vanilla)
+* HTML5
+* CSS3
+* JavaScript (Vanilla)
 
 ---
 
@@ -30,8 +30,8 @@ frontend/
 ├── components/       # Componentes reutilizáveis
 ├── css/              # Estilos
 └── js/               # Scripts e integração com API
+```
 
-```bash
 ---
 
 ## 🚧 Status do Desenvolvimento
@@ -40,9 +40,9 @@ O frontend encontra-se em fase inicial de desenvolvimento.
 
 Atualmente já foram implementados:
 
-- Estrutura base do projeto  
-- Organização de pastas  
-- Primeiras páginas e layout inicial  
+* Estrutura base do projeto
+* Organização de pastas
+* Primeiras páginas e layout inicial
 
 ⚠️ Algumas funcionalidades ainda não estão totalmente operacionais, pois dependem da finalização e integração com o backend.
 
@@ -54,20 +54,20 @@ O funcionamento completo da aplicação depende da API desenvolvida no backend.
 
 Nesta fase, podem ocorrer:
 
-- Falhas ao carregar dados  
-- Funcionalidades incompletas  
-- Comportamentos ainda não finalizados  
+* Falhas ao carregar dados
+* Funcionalidades incompletas
+* Comportamentos ainda não finalizados
 
 ---
 
 ## 📈 Próximos Passos
 
-- Integrar completamente com a API  
-- Implementar fluxo de abertura de caixa  
-- Conectar listagem de produtos  
-- Finalizar registro de vendas  
-- Desenvolver relatórios  
-- Refinar layout e experiência do usuário  
+* Integrar completamente com a API
+* Implementar fluxo de abertura de caixa
+* Conectar listagem de produtos
+* Finalizar registro de vendas
+* Desenvolver relatórios
+* Refinar layout e experiência do usuário
 
 ---
 
