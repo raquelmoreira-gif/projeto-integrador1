@@ -1,3 +1,17 @@
+from flask import Blueprint, request
+
+from app.services.responses import fail, ok
+from app.services.supabase_client import get_supabase
+
+vendas_bp = Blueprint("vendas", __name__, url_prefix="/api/vendas")
+
+FORMAS_PAGAMENTO = {"dinheiro", "pix", "debito", "credito"}
+
+
+def _required_present(body, required_fields):
+    return [field for field in required_fields if body.get(field) in (None, "", [])]
+
+
 @vendas_bp.post("")
 def criar_venda():
     body = request.get_json(silent=True) or {}
@@ -21,7 +35,6 @@ def criar_venda():
 
     sb = get_supabase()
 
-    # 🔎 BUSCA CAIXA ABERTO
     caixa_aberto = (
         sb.table("caixa")
         .select("id")
@@ -34,7 +47,6 @@ def criar_venda():
 
     caixa_id = caixa_aberto.data[0]["id"]
 
-    # 🔒 BLOQUEIA PRODUTOS DUPLICADOS
     produtos_vistos = set()
     for item in itens:
         produto_id = item.get("produto_id")
@@ -42,7 +54,6 @@ def criar_venda():
             return fail("Produto duplicado na venda", 422)
         produtos_vistos.add(produto_id)
 
-    # 🔥 BUSCA TODOS OS PRODUTOS DE UMA VEZ
     produto_ids = [item.get("produto_id") for item in itens if item.get("produto_id")]
 
     produtos_result = (
@@ -79,16 +90,17 @@ def criar_venda():
             return fail("Produto não encontrado", 404)
 
         preco = produtos_map[produto_id]
-
         subtotal = preco * quantidade
         valor_total += subtotal
 
-        itens_payload.append({
-            "produto_id": produto_id,
-            "quantidade": quantidade,
-            "preco_unitario": preco,
-            "subtotal": subtotal
-        })
+        itens_payload.append(
+            {
+                "produto_id": produto_id,
+                "quantidade": quantidade,
+                "preco_unitario": preco,
+                "subtotal": subtotal,
+            }
+        )
 
     if valor_total <= 0:
         return fail("Valor total da venda deve ser maior que zero", 422)
