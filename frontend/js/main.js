@@ -57,12 +57,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnCarregarProdutos && listaProdutos) {
     btnCarregarProdutos.addEventListener("click", async () => {
       try {
+        listaProdutos.innerHTML = "<p>Carregando produtos...</p>";
+
         const res = await listarProdutos();
-        const produtos = res.data || res;
+        console.log("Resposta produtos:", res);
+
+        const produtos = Array.isArray(res) ? res : res.data;
 
         listaProdutos.innerHTML = "";
 
-        if (!produtos || produtos.length === 0) {
+        if (!Array.isArray(produtos) || produtos.length === 0) {
           listaProdutos.innerHTML = "<p>Nenhum produto encontrado.</p>";
           return;
         }
@@ -75,14 +79,15 @@ document.addEventListener("DOMContentLoaded", () => {
           div.innerHTML = `
             <strong>${produto.nome ?? "Sem nome"}</strong><br>
             Preço: R$ ${Number(produto.preco ?? 0).toFixed(2)}<br>
-            Estoque: ${produto.quantidade_estoque ?? 0}<br>
+            Estoque: ${produto.quantidade_estoque ?? produto.estoque ?? 0}<br>
             Tipo: ${produto.tipo ?? "Não informado"}
           `;
 
           listaProdutos.appendChild(div);
         });
       } catch (error) {
-        listaProdutos.innerHTML = "<p>Erro ao carregar produtos.</p>";
+        console.error("Erro ao carregar produtos:", error);
+        listaProdutos.innerHTML = `<p>${error.message}</p>`;
       }
     });
   }
