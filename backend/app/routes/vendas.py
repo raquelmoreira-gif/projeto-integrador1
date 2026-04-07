@@ -61,6 +61,7 @@ def criar_venda():
 
     sb = get_supabase()
 
+    # 🔎 BUSCA CAIXA ABERTO
     caixa_aberto = (
         sb.table("caixa")
         .select("id")
@@ -74,6 +75,7 @@ def criar_venda():
     caixa_id = caixa_aberto.data[0]["id"]
 
     try:
+        # ✅ CRIA VENDA
         venda_result = (
             sb.table("vendas")
             .insert(
@@ -94,6 +96,7 @@ def criar_venda():
         venda = venda_result.data[0]
         venda_id = venda["id"]
 
+        # 🔎 VALIDA ITENS ANTES DE INSERIR
         itens_payload = []
         for item in itens:
             for field in ["produto_id", "quantidade", "preco_unitario", "subtotal"]:
@@ -102,9 +105,11 @@ def criar_venda():
 
             itens_payload.append({"venda_id": venda_id, **item})
 
+        # ✅ INSERE ITENS
         itens_result = sb.table("vendas_itens").insert(itens_payload).execute()
 
         if not itens_result.data:
+            # rollback manual
             sb.table("vendas").delete().eq("id", venda_id).execute()
             return fail("Erro ao inserir itens da venda", 500)
 
@@ -140,11 +145,26 @@ def atualizar_status_venda(venda_id: UUID):
     if venda["status"] == "cancelada":
         return fail("Venda já está cancelada", 400)
 
+    # 🔒 SE FOR CANCELAR → REMOVE ITENS (TRIGGER DEVOLVE ESTOQUE)
+    if status == "cancelada":
+        delete_result = (
+            sb.table("vendas_itens")
+            .delete()
+            .eq("venda_id", str(venda_id))
+            .execute()
+        )
+
+        if not delete_result:
+            return fail("Erro ao remover itens da venda", 500)
+
     result = (
         sb.table("vendas")
         .update({"status": status})
         .eq("id", str(venda_id))
         .execute()
     )
+
+    if not result.data:
+        return fail("Erro ao atualizar status", 500)
 
     return ok(result.data[0])
