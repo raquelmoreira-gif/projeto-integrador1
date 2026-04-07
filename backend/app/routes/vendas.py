@@ -1,39 +1,3 @@
-from uuid import UUID
-
-from flask import Blueprint, request
-
-from app.services.responses import fail, ok
-from app.services.supabase_client import get_supabase
-
-vendas_bp = Blueprint("vendas", __name__, url_prefix="/api/vendas")
-
-FORMAS_PAGAMENTO = frozenset({"dinheiro", "pix", "debito", "credito"})
-
-
-def _required_present(body: dict, fields: list[str]) -> list[str]:
-    missing = []
-    for field in fields:
-        val = body.get(field)
-        if field == "itens":
-            if val is None:
-                missing.append(field)
-        elif val is None or (isinstance(val, str) and not val.strip()):
-            missing.append(field)
-    return missing
-
-
-@vendas_bp.get("")
-def listar_vendas():
-    sb = get_supabase()
-    result = (
-        sb.table("vendas")
-        .select("*, vendas_itens(*)")
-        .order("criado_em", desc=True)
-        .execute()
-    )
-    return ok(result.data)
-
-
 @vendas_bp.post("")
 def criar_venda():
     body = request.get_json(silent=True) or {}
@@ -55,10 +19,6 @@ def criar_venda():
     if not itens:
         return fail("A venda precisa ter ao menos 1 item", 422)
 
-    valor_total = sum(item.get("subtotal", 0) for item in itens)
-    if valor_total <= 0:
-        return fail("Valor total da venda deve ser maior que zero", 422)
-
     sb = get_supabase()
 
     # 🔎 BUSCA CAIXA ABERTO
@@ -74,8 +34,58 @@ def criar_venda():
 
     caixa_id = caixa_aberto.data[0]["id"]
 
+    # 🔥 BUSCA TODOS OS PRODUTOS DE UMA VEZ
+    produto_ids = [item.get("produto_id") for item in itens if item.get("produto_id")]
+
+    produtos_result = (
+        sb.table("produtos")
+        .select("id, preco")
+        .in_("id", produto_ids)
+        .execute()
+    )
+
+    if not produtos_result.data:
+        return fail("Produtos não encontrados", 404)
+
+    produtos_map = {p["id"]: p["preco"] for p in produtos_result.data}
+
+    valor_total = 0
+    itens_payload = []
+
+    for item in itens:
+        produto_id = item.get("produto_id")
+        quantidade = item.get("quantidade")
+
+        if not produto_id or quantidade is None:
+            return fail("Item deve conter produto_id e quantidade", 422)
+
+        try:
+            quantidade = int(quantidade)
+        except (TypeError, ValueError):
+            return fail("Quantidade deve ser um numero inteiro", 422)
+
+        if quantidade <= 0:
+            return fail("Quantidade deve ser maior que zero", 422)
+
+        if produto_id not in produtos_map:
+            return fail("Produto não encontrado", 404)
+
+        preco = produtos_map[produto_id]
+
+        subtotal = preco * quantidade
+        valor_total += subtotal
+
+        itens_payload.append({
+            "produto_id": produto_id,
+            "quantidade": quantidade,
+            "preco_unitario": preco,
+            "subtotal": subtotal
+        })
+
+    if valor_total <= 0:
+        return fail("Valor total da venda deve ser maior que zero", 422)
+
     try:
-        # ✅ CRIA VENDA
         venda_result = (
             sb.table("vendas")
             .insert(
@@ -96,20 +106,12 @@ def criar_venda():
         venda = venda_result.data[0]
         venda_id = venda["id"]
 
-        # 🔎 VALIDA ITENS ANTES DE INSERIR
-        itens_payload = []
-        for item in itens:
-            for field in ["produto_id", "quantidade", "preco_unitario", "subtotal"]:
-                if item.get(field) is None:
-                    return fail(f"Item com campo obrigatorio ausente: {field}", 422)
+        for item in itens_payload:
+            item["venda_id"] = venda_id
 
-            itens_payload.append({"venda_id": venda_id, **item})
-
-        # ✅ INSERE ITENS
         itens_result = sb.table("vendas_itens").insert(itens_payload).execute()
 
         if not itens_result.data:
-            # rollback manual
             sb.table("vendas").delete().eq("id", venda_id).execute()
             return fail("Erro ao inserir itens da venda", 500)
 
@@ -117,54 +119,3 @@ def criar_venda():
 
     except Exception as e:
         return fail(f"Erro ao criar venda: {str(e)}", 500)
-
-
-@vendas_bp.patch("/<uuid:venda_id>/status")
-def atualizar_status_venda(venda_id: UUID):
-    body = request.get_json(silent=True) or {}
-    status = body.get("status")
-
-    if status not in ["pendente", "paga", "cancelada"]:
-        return fail("Status invalido", 422)
-
-    sb = get_supabase()
-
-    venda_result = (
-        sb.table("vendas")
-        .select("*")
-        .eq("id", str(venda_id))
-        .limit(1)
-        .execute()
-    )
-
-    if not venda_result.data:
-        return fail("Venda nao encontrada", 404)
-
-    venda = venda_result.data[0]
-
-    if venda["status"] == "cancelada":
-        return fail("Venda já está cancelada", 400)
-
-    # 🔒 SE FOR CANCELAR → REMOVE ITENS (TRIGGER DEVOLVE ESTOQUE)
-    if status == "cancelada":
-        delete_result = (
-            sb.table("vendas_itens")
-            .delete()
-            .eq("venda_id", str(venda_id))
-            .execute()
-        )
-
-        if not delete_result:
-            return fail("Erro ao remover itens da venda", 500)
-
-    result = (
-        sb.table("vendas")
-        .update({"status": status})
-        .eq("id", str(venda_id))
-        .execute()
-    )
-
-    if not result.data:
-        return fail("Erro ao atualizar status", 500)
-
-    return ok(result.data[0])
