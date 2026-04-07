@@ -6,23 +6,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const dataCaixa = document.getElementById("dataCaixa");
   const valorInicial = document.getElementById("valorInicial");
 
-    const hoje = new Date().toISOString().split("T")[0];
+  const hoje = new Date().toISOString().split("T")[0];
 
   if (dataCaixa) {
     dataCaixa.value = hoje;
   }
 
-  // 🔹 Verifica se já existe caixa aberto ao carregar
+  // 🔹 Verifica caixa aberto
   if (mensagem) {
     buscarCaixaAberto()
       .then((res) => {
         if (res && res.data) {
           mensagem.textContent = "Já existe um caixa aberto.";
+
+          if (btnAbrirCaixa) {
+            btnAbrirCaixa.disabled = true;
+            btnAbrirCaixa.style.opacity = "0.6";
+            btnAbrirCaixa.style.cursor = "not-allowed";
+          }
         }
       })
-      .catch(() => {
-        // ignora erro por enquanto
-      });
+      .catch(() => {});
   }
 
   // 🔹 Abrir caixa
