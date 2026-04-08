@@ -1,44 +1,114 @@
-const API_BASE_URL = "https://projeto-integrador1-backend.onrender.com/api";
+function apiBase() {
+  return window.API_BASE_URL || "https://projeto-integrador1-backend.onrender.com/api";
+}
+
+async function apiRequest(path, options = {}) {
+  const response = await fetch(`${apiBase()}${path}`, options);
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(result.error || result.message || `Erro HTTP ${response.status}`);
+  }
+  if (result.success === false) {
+    throw new Error(result.error || "Operação não concluída");
+  }
+  return result.data;
+}
 
 async function listarProdutos() {
-  const response = await fetch(`${API_BASE_URL}/produtos/`);
-  const result = await response.json();
+  return apiRequest("/produtos/");
+}
 
-  if (!response.ok) {
-    throw new Error(result.error || result.message || "Erro ao listar produtos");
-  }
+async function criarProduto(body) {
+  return apiRequest("/produtos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
 
-  return result;
+async function atualizarProduto(produtoId, body) {
+  return apiRequest(`/produtos/${produtoId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+async function movimentarEstoque(produtoId, body) {
+  return apiRequest(`/produtos/${produtoId}/movimentar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      tipo: body.tipo,
+      quantidade: Number(body.quantidade),
+      motivo: body.motivo || "ajuste_manual",
+    }),
+  });
 }
 
 async function abrirCaixa(data, valorInicial) {
-  const response = await fetch(`${API_BASE_URL}/caixa/abrir`, {
+  return apiRequest("/caixa/abrir", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      data: data,
+      data,
       valor_inicial: Number(valorInicial),
     }),
   });
-
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.error || result.message || "Erro ao abrir caixa");
-  }
-
-  return result;
 }
 
 async function buscarCaixaAberto() {
-  const response = await fetch(`${API_BASE_URL}/caixa/aberto`);
-  const result = await response.json();
+  return apiRequest("/caixa/aberto");
+}
 
-  if (!response.ok) {
-    throw new Error(result.error || result.message || "Erro ao buscar caixa aberto");
-  }
+async function fecharCaixa(caixaId, valorFinal) {
+  return apiRequest(`/caixa/${caixaId}/fechar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ valor_final: Number(valorFinal) }),
+  });
+}
 
-  return result;
+async function listarUsuarios() {
+  return apiRequest("/usuarios");
+}
+
+async function criarUsuario(body) {
+  return apiRequest("/usuarios", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+async function criarVenda(payload) {
+  return apiRequest("/vendas", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+async function relatorioCaixa() {
+  return apiRequest("/relatorios/caixa");
+}
+
+async function relatorioVendasProduto() {
+  return apiRequest("/relatorios/vendas-produto");
+}
+
+async function relatorioVendasDia() {
+  return apiRequest("/relatorios/vendas-dia");
+}
+
+async function relatorioEstoque() {
+  return apiRequest("/relatorios/estoque");
+}
+
+async function relatorioEstoqueBaixo() {
+  return apiRequest("/relatorios/estoque-baixo");
+}
+
+async function relatorioConsignado() {
+  return apiRequest("/relatorios/consignado");
 }
