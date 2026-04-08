@@ -4,19 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Caixa - Bia Criativa</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <div class="layout">
     <aside class="sidebar">
       <div class="logo">Bia Criativa</div>
+      <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
 
       <nav class="menu">
         <a href="../index.html">Dashboard</a>
         <a href="#" class="active">Caixa</a>
         <a href="vendas.html">Vendas</a>
         <a href="produtos.html">Produtos</a>
+        <a href="estoque.html">Estoque</a>
         <a href="relatorios.html">Relatórios</a>
+        <a href="usuarios.html">Usuários</a>
+        <a href="login.html">Entrar</a>
       </nav>
     </aside>
 
@@ -29,34 +34,37 @@
         <section class="cards">
           <div class="card">
             <p class="card-title">Status do Caixa</p>
-            <h2>Aberto</h2>
-            <span class="card-info">Atualizado hoje</span>
+            <h2 id="caixaStatusTitulo">—</h2>
+            <span class="card-info" id="caixaStatusInfo">Carregando…</span>
           </div>
 
           <div class="card">
-            <p class="card-title">Total do Dia</p>
-            <h2>R$ 0,00</h2>
-            <span class="card-info">Resumo parcial</span>
+            <p class="card-title">Total vendido (caixa aberto)</p>
+            <h2 id="caixaTotalDia">—</h2>
+            <span class="card-info" id="caixaTotalDiaInfo">—</span>
           </div>
         </section>
 
         <section class="panel">
           <h2>Abertura de Caixa</h2>
           <input type="date" id="dataCaixa">
-          <input type="number" id="valorInicial" placeholder="Valor inicial">
-          <button id="btnAbrirCaixa">Abrir Caixa</button>
+          <input type="number" id="valorInicial" placeholder="Valor inicial" min="0" step="0.01">
+          <button type="button" id="btnAbrirCaixa">Abrir Caixa</button>
           <p id="mensagem"></p>
         </section>
 
         <section class="panel">
           <h2>Fechamento de Caixa</h2>
-          <input type="number" placeholder="Valor final">
-          <button>Fechar Caixa</button>
+          <input type="number" id="valorFinalCaixa" placeholder="Valor final contado" min="0" step="0.01">
+          <button type="button" id="btnFecharCaixa">Fechar Caixa</button>
+          <p id="mensagemFechar"></p>
         </section>
       </main>
     </div>
   </div>
 
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
   <script src="../js/api.js"></script>
   <script src="../js/main.js"></script>
 </body>
