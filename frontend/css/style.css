@@ -53,6 +53,30 @@ body {
   color: white;
 }
 
+.sidebar-user {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.sidebar-user span {
+  color: #e5e7eb;
+  font-weight: 600;
+}
+
+.link-sair {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #93c5fd !important;
+  text-decoration: underline;
+}
+
+.link-sair:hover {
+  color: #bfdbfe !important;
+}
+
 /* CONTEÚDO */
 .content-area {
   flex: 1;
@@ -70,7 +94,7 @@ body {
 /* CARDS */
 .cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -121,8 +145,113 @@ body {
   outline: none;
 }
 
-.panel input:focus {
+.panel input:focus,
+.panel select:focus {
   border-color: #4A5FFF;
+}
+
+.panel select {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+}
+
+.panel form button {
+  margin-top: 4px;
+}
+
+.text-muted {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.msg-erro {
+  color: #dc2626;
+  margin-bottom: 12px;
+}
+
+.aviso-login {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+}
+
+.aviso-login a {
+  color: #4A5FFF;
+  font-weight: 600;
+}
+
+.produto-linha,
+.rel-linha {
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.rel-linha:last-child {
+  border-bottom: none;
+}
+
+.venda-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.btn-remover {
+  flex-shrink: 0;
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+.btn-remover:hover {
+  background: #e5e7eb !important;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.data-table th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.redirect-msg {
+  padding: 24px;
+  font-size: 16px;
+}
+
+.panel-login code {
+  font-size: 12px;
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.panel-consignado {
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
 }
 
 .panel button {
@@ -136,6 +265,38 @@ body {
 
 .panel button:hover {
   background-color: #3b4ee0;
+}
+
+.panel .btn-ghost {
+  margin-top: 8px;
+  background: transparent !important;
+  color: #4b5563 !important;
+  border: 1px solid #d1d5db;
+}
+
+.panel .btn-ghost:hover {
+  background: #f3f4f6 !important;
+}
+
+.produto-acoes {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-inline {
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  border-radius: 6px !important;
+}
+
+.btn-inline--sec {
+  background: #6b7280 !important;
+}
+
+.btn-inline--sec:hover {
+  background: #4b5563 !important;
 }
 
 #mensagem {
