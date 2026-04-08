@@ -4,19 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Produtos - Bia Criativa</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <div class="layout">
     <aside class="sidebar">
       <div class="logo">Bia Criativa</div>
+      <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
 
       <nav class="menu">
         <a href="../index.html">Dashboard</a>
         <a href="caixa.html">Caixa</a>
         <a href="vendas.html">Vendas</a>
         <a href="#" class="active">Produtos</a>
+        <a href="estoque.html">Estoque</a>
         <a href="relatorios.html">Relatórios</a>
+        <a href="usuarios.html">Usuários</a>
+        <a href="login.html">Entrar</a>
       </nav>
     </aside>
 
@@ -27,14 +32,84 @@
 
       <main class="main-content">
         <section class="panel">
+          <h2>Novo produto</h2>
+          <form id="formNovoProduto">
+            <input type="text" id="npNome" placeholder="Nome" required>
+            <input type="number" id="npPreco" placeholder="Preço" min="0" step="0.01" required>
+            <input type="number" id="npEstoque" placeholder="Quantidade em estoque" min="0" step="1" required>
+            <select id="npTipo" required>
+              <option value="">Tipo</option>
+              <option value="proprio">Próprio</option>
+              <option value="consignado">Consignado</option>
+            </select>
+            <div id="npConsignadoExtras" class="panel-consignado" style="display: none;">
+              <p class="text-muted">Consignado: informe o UUID do artesão (tabela <code>artesaos</code> no banco) e o repasse, conforme o modelo do README.</p>
+              <input type="text" id="npArtesaoId" placeholder="UUID do artesão (opcional)" autocomplete="off">
+              <select id="npTipoRepasse">
+                <option value="">Sem repasse neste cadastro</option>
+                <option value="porcentagem">Repasse por porcentagem</option>
+                <option value="fixo">Repasse valor fixo</option>
+              </select>
+              <input type="number" id="npPorcentagemRepasse" placeholder="Porcentagem (%)" min="0" step="0.01">
+              <input type="number" id="npValorCusto" placeholder="Valor custo (repasse fixo)" min="0" step="0.01">
+            </div>
+            <button type="submit">Cadastrar</button>
+          </form>
+          <p id="mensagemProduto"></p>
+        </section>
+
+        <section class="panel" id="panelEditar" style="display: none;">
+          <h2>Editar produto</h2>
+          <input type="hidden" id="editProdutoId">
+          <input type="text" id="editNome" placeholder="Nome">
+          <input type="number" id="editPreco" placeholder="Preço" min="0" step="0.01">
+          <input type="number" id="editEstoque" placeholder="Quantidade em estoque" min="0" step="1">
+          <select id="editTipo">
+            <option value="proprio">Próprio</option>
+            <option value="consignado">Consignado</option>
+          </select>
+          <div id="editConsignadoExtras" class="panel-consignado" style="display: none;">
+            <input type="text" id="editArtesaoId" placeholder="UUID do artesão" autocomplete="off">
+            <select id="editTipoRepasse">
+              <option value="">Sem repasse / limpar repasse</option>
+              <option value="porcentagem">Repasse por porcentagem</option>
+              <option value="fixo">Repasse valor fixo</option>
+            </select>
+            <input type="number" id="editPorcentagemRepasse" placeholder="Porcentagem (%)" min="0" step="0.01">
+            <input type="number" id="editValorCusto" placeholder="Valor custo (repasse fixo)" min="0" step="0.01">
+          </div>
+          <button type="button" id="btnSalvarEdicao">Salvar alterações</button>
+          <button type="button" id="btnCancelarEdicao" class="btn-ghost">Cancelar</button>
+          <p id="mensagemEditar"></p>
+        </section>
+
+        <section class="panel" id="panelMovimentar">
+          <h2>Movimentar estoque</h2>
+          <p class="text-muted">Registra linhas em <code>movimentacoes_estoque</code> (histórico). O efeito em <code>produtos.quantidade_estoque</code> depende dos triggers no banco (ver README do database).</p>
+          <select id="movProdutoSelect">
+            <option value="">Carregue a lista de produtos antes</option>
+          </select>
+          <select id="movTipo">
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída</option>
+          </select>
+          <input type="number" id="movQtd" placeholder="Quantidade" min="1" step="1">
+          <input type="text" id="movMotivo" placeholder="Motivo (opcional)">
+          <button type="button" id="btnMovimentar">Registrar movimentação</button>
+          <p id="msgMovimentacao"></p>
+        </section>
+
+        <section class="panel">
           <h2>Lista de Produtos</h2>
-          <button id="btnCarregarProdutos">Carregar Produtos</button>
+          <button type="button" id="btnCarregarProdutos">Carregar Produtos</button>
           <div id="listaProdutos"></div>
         </section>
       </main>
     </div>
   </div>
 
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
   <script src="../js/api.js"></script>
   <script src="../js/main.js"></script>
 </body>
