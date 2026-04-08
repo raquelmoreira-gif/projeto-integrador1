@@ -1,1 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estoque - Bia Criativa</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Bia Criativa</div>
+      <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
+
+      <nav class="menu">
+        <a href="../index.html">Dashboard</a>
+        <a href="caixa.html">Caixa</a>
+        <a href="vendas.html">Vendas</a>
+        <a href="produtos.html">Produtos</a>
+        <a href="#" class="active">Estoque</a>
+        <a href="relatorios.html">Relatórios</a>
+        <a href="usuarios.html">Usuários</a>
+        <a href="login.html">Entrar</a>
+      </nav>
+    </aside>
+
+    <div class="content-area">
+      <header class="header">
+        <h1>Estoque</h1>
+      </header>
+
+      <main class="main-content">
+        <section class="panel">
+          <h2>Estoque atual</h2>
+          <div id="tabelaEstoque">Carregando…</div>
+        </section>
+
+        <section class="panel">
+          <h2>Alerta: estoque baixo (≤ 2)</h2>
+          <div id="listaEstoqueBaixo">Carregando…</div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
 
