@@ -4,19 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vendas - Bia Criativa</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <div class="layout">
     <aside class="sidebar">
       <div class="logo">Bia Criativa</div>
+      <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
 
       <nav class="menu">
         <a href="../index.html">Dashboard</a>
         <a href="caixa.html">Caixa</a>
         <a href="#" class="active">Vendas</a>
         <a href="produtos.html">Produtos</a>
+        <a href="estoque.html">Estoque</a>
         <a href="relatorios.html">Relatórios</a>
+        <a href="usuarios.html">Usuários</a>
+        <a href="login.html">Entrar</a>
       </nav>
     </aside>
 
@@ -26,6 +31,10 @@
       </header>
 
       <main class="main-content">
+        <p id="avisoLoginVendas" class="panel aviso-login">
+          Para registrar vendas na API, <a href="login.html">identifique o operador aqui</a>.
+        </p>
+
         <section class="cards">
           <div class="card">
             <p class="card-title">Itens na Venda</p>
@@ -41,13 +50,12 @@
         </section>
 
         <section class="panel">
-          <h2>Adicionar Produto</h2>
-
-          <input type="text" id="nomeProduto" placeholder="Nome do produto">
-          <input type="number" id="quantidadeProduto" placeholder="Quantidade">
-          <input type="number" id="precoProduto" placeholder="Preço unitário">
-
-          <button id="btnAdicionarProduto">Adicionar à Venda</button>
+          <h2>Adicionar à venda</h2>
+          <select id="selectProdutoVenda">
+            <option value="">Carregando produtos…</option>
+          </select>
+          <input type="number" id="quantidadeProduto" placeholder="Quantidade" min="1" step="1">
+          <button type="button" id="btnAdicionarProduto">Adicionar à Venda</button>
         </section>
 
         <section class="panel">
@@ -57,7 +65,6 @@
 
         <section class="panel">
           <h2>Finalizar Venda</h2>
-
           <select id="formaPagamento">
             <option value="">Selecione a forma de pagamento</option>
             <option value="dinheiro">Dinheiro</option>
@@ -65,14 +72,15 @@
             <option value="debito">Débito</option>
             <option value="credito">Crédito</option>
           </select>
-
-          <button id="btnFinalizarVenda">Finalizar Venda</button>
+          <button type="button" id="btnFinalizarVenda">Finalizar Venda</button>
           <p id="mensagemVenda"></p>
         </section>
       </main>
     </div>
   </div>
 
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
   <script src="../js/api.js"></script>
   <script src="../js/main.js"></script>
 </body>
