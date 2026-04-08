@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - Bia Criativa</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Bia Criativa</div>
+      <nav class="menu">
+        <a href="../index.html">Dashboard</a>
+        <a href="caixa.html">Caixa</a>
+        <a href="vendas.html">Vendas</a>
+        <a href="produtos.html">Produtos</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="relatorios.html">Relatórios</a>
+        <a href="usuarios.html">Usuários</a>
+        <a href="#" class="active">Entrar</a>
+      </nav>
+    </aside>
+
+    <div class="content-area">
+      <header class="header">
+        <h1>Identificação do operador</h1>
+      </header>
+
+      <main class="main-content">
+        <section class="panel panel-login">
+          <p>Selecione o usuário cadastrado no sistema (tabela <code>usuarios</code>). Necessário para registrar vendas (<code>usuario_id</code>). Cadastre novos usuários em <a href="usuarios.html">Usuários</a>.</p>
+          <select id="selectUsuarioLogin">
+            <option value="">Carregando usuários…</option>
+          </select>
+          <button type="button" id="btnEntrarLogin">Entrar</button>
+          <button type="button" id="btnSairLogin" class="btn-ghost">Sair / trocar operador</button>
+          <p id="mensagemLogin"></p>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
 
