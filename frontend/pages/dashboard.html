@@ -1,14 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=../index.html">
-  <title>Redirecionando…</title>
-  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bia Criativa - Painel de Controle</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <p class="redirect-msg">Redirecionando para o <a href="../index.html">painel principal</a>…</p>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="ph ph-intersect-three"></i>
+                <span>Bia Criativa</span>
+            </div>
+            
+            <div class="user-info">
+                <p>Operador: <strong>Não identificado</strong></p>
+                <a href="#">Sair</a>
+            </div>
+
+            <nav class="menu">
+                <a href="#" class="active"><i class="ph ph-layout"></i> Dashboard</a>
+                <a href="#"><i class="ph ph-cash-register"></i> Caixa</a>
+                <a href="#"><i class="ph ph-chart-line-up"></i> Vendas</a>
+                <a href="#"><i class="ph ph-shopping-cart"></i> Produtos</a>
+                <a href="#"><i class="ph ph-package"></i> Estoque</a>
+                <a href="#"><i class="ph ph-chart-bar"></i> Relatórios</a>
+                <a href="#"><i class="ph ph-users"></i> Usuários</a>
+                <a href="#" class="btn-entrar"><i class="ph ph-sign-in"></i> Entrar</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Painel de Controle</h1>
+            </header>
+
+            <section class="stats-grid">
+                <div class="card card-status">
+                    <div class="card-header">
+                        <span>Caixa Atual</span>
+                        <i class="ph ph-lock-simple"></i>
+                    </div>
+                    <div class="card-body">
+                        <h2>Fechado <span class="badge">Fechado</span></h2>
+                        <p>Abra o caixa na página Caixa</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span>Total Vendido (caixa)</span>
+                        <i class="ph ph-money"></i>
+                    </div>
+                    <div class="card-body">
+                        <h2>R$ 0,00</h2>
+                        <p>—</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span>Vendas (caixa)</span>
+                        <i class="ph ph-presentation-chart"></i>
+                    </div>
+                    <div class="card-body">
+                        <h2>0</h2>
+                        <p>No caixa aberto</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="details-grid">
+                <div class="box box-abertura">
+                    <h3>Abertura de Caixa</h3>
+                    <form class="form-abertura">
+                        <div class="input-group">
+                            <label>Data de Abertura</label>
+                            <input type="date" value="2026-04-09">
+                        </div>
+                        <div class="input-group">
+                            <label>Valor Inicial (R$)</label>
+                            <input type="text" placeholder="0,00">
+                        </div>
+                        <button type="button" class="btn-abrir">Abrir Caixa</button>
+                    </form>
+                </div>
+
+                <div class="box box-produtos">
+                    <h3>Produtos (prévia)</h3>
+                    <div class="empty-state">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" alt="Icone produtos" width="80">
+                        <p>Nenhum produto carregado. Clique para visualizar.</p>
+                        <button class="btn-carregar">Carregar Produtos</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 </body>
 </html>
-
