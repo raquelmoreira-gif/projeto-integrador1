@@ -1,18 +1,24 @@
 function apiBase() {
-  return window.API_BASE_URL || "https://projeto-integrador1-backend.onrender.com/api";
+  return window.API_BASE_URL || "http://127.0.0.1:5000/api" || "https://projeto-integrador1-backend.onrender.com/api";
 }
 
 async function apiRequest(path, options = {}) {
-  const response = await fetch(`${apiBase()}${path}`, options);
+  const url = `${apiBase()}${path}`;
+  const response = await fetch(url, options);
   const result = await response.json().catch(() => ({}));
+
   if (!response.ok) {
     throw new Error(result.error || result.message || `Erro HTTP ${response.status}`);
   }
+
   if (result.success === false) {
     throw new Error(result.error || "Operação não concluída");
   }
+
   return result.data;
 }
+
+/* ================= PRODUTOS ================= */
 
 async function listarProdutos() {
   return apiRequest("/produtos/");
@@ -46,6 +52,8 @@ async function movimentarEstoque(produtoId, body) {
   });
 }
 
+/* ================= CAIXA ================= */
+
 async function abrirCaixa(data, valorInicial) {
   return apiRequest("/caixa/abrir", {
     method: "POST",
@@ -69,6 +77,8 @@ async function fecharCaixa(caixaId, valorFinal) {
   });
 }
 
+/* ================= USUARIOS ================= */
+
 async function listarUsuarios() {
   return apiRequest("/usuarios");
 }
@@ -81,6 +91,8 @@ async function criarUsuario(body) {
   });
 }
 
+/* ================= VENDAS ================= */
+
 async function criarVenda(payload) {
   return apiRequest("/vendas", {
     method: "POST",
@@ -88,6 +100,8 @@ async function criarVenda(payload) {
     body: JSON.stringify(payload),
   });
 }
+
+/* ================= RELATORIOS ================= */
 
 async function relatorioCaixa() {
   return apiRequest("/relatorios/caixa");
