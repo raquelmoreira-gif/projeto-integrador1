@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bia Criativa - Dashboard</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
@@ -14,108 +15,157 @@
                 <div class="logo-icon">BC</div>
                 <span class="logo-text">Bia Criativa</span>
             </div>
-            
-            <div class="sidebar-user">
-                Operador: <span>Não identificado</span>
-                <a href="#" class="link-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
-            </div>
+
+            <p class="sidebar-user">
+                Operador: <span id="usuarioLogado">—</span>
+            </p>
 
             <nav class="menu">
                 <p class="nav-label">Principal</p>
+
                 <a href="dashboard.html" class="active">
-                    <div class="nav-icon"><i class="fa-solid fa-chart-pie"></i></div> Dashboard
+                    <div class="nav-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                    Dashboard
                 </a>
-                <a href="#">
-                    <div class="nav-icon"><i class="fa-solid fa-cash-register"></i></div> Caixa
+
+                <a href="caixa.html">
+                    <div class="nav-icon"><i class="fa-solid fa-cash-register"></i></div>
+                    Caixa
                 </a>
-                <a href="#">
-                    <div class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></div> Vendas
+
+                <a href="vendas.html">
+                    <div class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+                    Vendas
                 </a>
-                <a href="#">
-                    <div class="nav-icon"><i class="fa-solid fa-box"></i></div> Produtos
+
+                <a href="produtos.html">
+                    <div class="nav-icon"><i class="fa-solid fa-box"></i></div>
+                    Produtos
                 </a>
-                <a href="#">
-                    <div class="nav-icon"><i class="fa-solid fa-warehouse"></i></div> Estoque
+
+                <a href="estoque.html">
+                    <div class="nav-icon"><i class="fa-solid fa-warehouse"></i></div>
+                    Estoque
                 </a>
-                <a href="#">
-                    <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div> Relatórios
+
+                <a href="relatorios.html">
+                    <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    Relatórios
                 </a>
-                <a href="#">
-                    <div class="nav-icon"><i class="fa-solid fa-users"></i></div> Usuários
+
+                <a href="usuarios.html">
+                    <div class="nav-icon"><i class="fa-solid fa-users"></i></div>
+                    Usuários
                 </a>
+
                 <p class="nav-label">Sistema</p>
-                <a href="#">
-                    <div class="nav-icon"><i class="fa-solid fa-user-check"></i></div> Entrar
+
+                <a href="login.html">
+                    <div class="nav-icon"><i class="fa-solid fa-user-check"></i></div>
+                    Entrar
                 </a>
             </nav>
         </aside>
 
-        <main class="content-area">
+        <div class="content-area">
             <header class="header">
                 <h1>Painel de Controle</h1>
             </header>
 
-            <div class="main-content">
+            <main class="main-content">
+
+                <!-- CARDS -->
                 <section class="cards">
+
                     <div class="card">
                         <div class="card-header">
                             <span class="card-title">Caixa Atual</span>
-                            <div class="card-icon icon-blue"><i class="fa-solid fa-lock"></i></div>
+                            <div class="card-icon icon-blue">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
                         </div>
-                        <h2>Fechado <span class="card-badge badge-closed">Fechado</span></h2>
-                        <p class="card-info">Abra o caixa na página Caixa</p>
+
+                        <h2 id="dashCaixaStatus">Fechado</h2>
+                        <p id="dashCaixaInfo" class="card-info">Abra o caixa abaixo</p>
                     </div>
 
                     <div class="card">
                         <div class="card-header">
                             <span class="card-title">Total Vendido (caixa)</span>
-                            <div class="card-icon icon-green"><i class="fa-solid fa-money-bill-wave"></i></div>
+                            <div class="card-icon icon-green">
+                                <i class="fa-solid fa-money-bill-wave"></i>
+                            </div>
                         </div>
-                        <h2>R$ 0,00</h2>
-                        <p class="card-info">—</p>
+
+                        <h2 id="dashTotalVendido">R$ 0,00</h2>
+                        <p id="dashVendasInfo" class="card-info">—</p>
                     </div>
 
                     <div class="card">
                         <div class="card-header">
                             <span class="card-title">Vendas (caixa)</span>
-                            <div class="card-icon icon-amber"><i class="fa-solid fa-chart-line"></i></div>
+                            <div class="card-icon icon-amber">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
                         </div>
-                        <h2>0</h2>
+
+                        <h2 id="dashQtdVendas">0</h2>
                         <p class="card-info">No caixa aberto</p>
                     </div>
+
                 </section>
 
+                <!-- GRID -->
                 <section class="dashboard-grid">
+
+                    <!-- ESQUERDA -->
                     <div class="dashboard-main">
                         <div class="panel">
                             <h2>Abertura de Caixa</h2>
-                            <form>
-                                <div class="panel-row">
-                                    <div class="form-group">
-                                        <label>Data de Abertura</label>
-                                        <input type="date" value="2026-04-09">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Valor Inicial (R$)</label>
-                                        <input type="number" step="0.01" placeholder="0,00">
-                                    </div>
+
+                            <div class="panel-row">
+                                <div class="form-group">
+                                    <label>Data</label>
+                                    <input type="date" id="dataCaixa">
                                 </div>
-                                <button type="submit" class="btn-primary">Abrir Caixa</button>
-                            </form>
+
+                                <div class="form-group">
+                                    <label>Valor inicial (R$)</label>
+                                    <input type="number" id="valorInicial" step="0.01" placeholder="0,00">
+                                </div>
+                            </div>
+
+                            <button type="button" id="btnAbrirCaixa" class="btn-primary">
+                                Abrir Caixa
+                            </button>
+
+                            <p id="mensagem"></p>
                         </div>
                     </div>
 
+                    <!-- DIREITA -->
                     <aside class="side-panel">
                         <h2>Produtos (prévia)</h2>
-                        <div class="card-icon icon-blue" style="width: 80px; height: 80px; font-size: 30px; margin: 20px auto;">
-                            <i class="fa-solid fa-boxes-stacked"></i>
+
+                        <div id="listaProdutos">
+                            <p>Nenhum produto carregado.</p>
                         </div>
-                        <p>Nenhum produto carregado. Clique para visualizar.</p>
-                        <button class="btn-primary btn-ghost">Carregar Produtos</button>
+
+                        <button id="btnCarregarProdutos" class="btn-primary btn-ghost">
+                            Carregar Produtos
+                        </button>
                     </aside>
+
                 </section>
-            </div>
-        </main>
+
+            </main>
+        </div>
     </div>
+
+    <!-- ✅ ESSENCIAL -->
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/main.js"></script>
 </body>
 </html>
