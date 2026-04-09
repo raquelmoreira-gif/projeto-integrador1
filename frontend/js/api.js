@@ -3,7 +3,10 @@ function apiBase() {
 }
 
 async function apiRequest(path, options = {}) {
-  const response = await fetch(`${apiBase()}${path}`, options);
+  const response = await fetch(`${apiBase()}${path}`, {
+    cache: "no-store",
+    ...options
+  });
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(result.error || result.message || `Erro HTTP ${response.status}`);
