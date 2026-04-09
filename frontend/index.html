@@ -4,66 +4,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bia Criativa - Dashboard</title>
-
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <div class="layout">
-
     <aside class="sidebar">
       <div class="logo">
         <div class="logo-icon">BC</div>
         <span class="logo-text">Bia Criativa</span>
       </div>
 
-      <p class="sidebar-user">
-        Operador: <span id="usuarioLogado">—</span>
-      </p>
+      <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
 
       <nav class="menu">
-        <p class="nav-label">Principal</p>
-
         <a href="#" class="active">
-          <div class="nav-icon"><i class="fa-solid fa-chart-pie"></i></div>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+            </svg>
+          </span>
           Dashboard
         </a>
 
         <a href="pages/caixa.html">
-          <div class="nav-icon"><i class="fa-solid fa-cash-register"></i></div>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+          </span>
           Caixa
         </a>
 
         <a href="pages/vendas.html">
-          <div class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </span>
           Vendas
         </a>
 
         <a href="pages/produtos.html">
-          <div class="nav-icon"><i class="fa-solid fa-box"></i></div>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </span>
           Produtos
         </a>
 
         <a href="pages/estoque.html">
-          <div class="nav-icon"><i class="fa-solid fa-warehouse"></i></div>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13" rx="1"/>
+              <path d="M16 8h4l3 3v5h-7V8z"/>
+            </svg>
+          </span>
           Estoque
         </a>
 
         <a href="pages/relatorios.html">
-          <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
           Relatórios
         </a>
 
         <a href="pages/usuarios.html">
-          <div class="nav-icon"><i class="fa-solid fa-users"></i></div>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+            </svg>
+          </span>
           Usuários
         </a>
 
-        <p class="nav-label">Sistema</p>
-
         <a href="pages/login.html">
-          <div class="nav-icon"><i class="fa-solid fa-user-check"></i></div>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+              <polyline points="10 17 15 12 10 7"/>
+              <line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+          </span>
           Entrar
         </a>
       </nav>
@@ -75,80 +110,25 @@
       </header>
 
       <main class="main-content">
-
         <section class="cards">
           <div class="card">
-            <div class="card-header">
-              <span class="card-title">Caixa Atual</span>
-              <div class="card-icon icon-blue">
-                <i class="fa-solid fa-lock"></i>
-              </div>
-            </div>
-            <h2 id="dashCaixaStatus">Fechado</h2>
-            <p id="dashCaixaInfo" class="card-info">Abra o caixa abaixo</p>
+            <p class="card-title">Caixa Atual</p>
+            <h2 id="dashCaixaStatus">—</h2>
+            <span class="card-info" id="dashCaixaInfo">Carregando…</span>
           </div>
 
           <div class="card">
-            <div class="card-header">
-              <span class="card-title">Total Vendido (caixa)</span>
-              <div class="card-icon icon-green">
-                <i class="fa-solid fa-money-bill-wave"></i>
-              </div>
-            </div>
-            <h2 id="dashTotalVendido">R$ 0,00</h2>
-            <p id="dashVendasInfo" class="card-info">—</p>
+            <p class="card-title">Total Vendido (caixa)</p>
+            <h2 id="dashTotalVendido">—</h2>
+            <span class="card-info" id="dashVendasInfo">—</span>
           </div>
 
           <div class="card">
-            <div class="card-header">
-              <span class="card-title">Vendas (caixa)</span>
-              <div class="card-icon icon-amber">
-                <i class="fa-solid fa-chart-line"></i>
-              </div>
-            </div>
-            <h2 id="dashQtdVendas">0</h2>
-            <p class="card-info">No caixa aberto</p>
+            <p class="card-title">Vendas (caixa)</p>
+            <h2 id="dashQtdVendas">—</h2>
+            <span class="card-info">No caixa aberto</span>
           </div>
         </section>
-
-        <section class="dashboard-grid">
-          <div class="dashboard-main">
-            <div class="panel">
-              <h2>Abertura de Caixa</h2>
-
-              <div class="panel-row">
-                <div class="form-group">
-                  <label>Data</label>
-                  <input type="date" id="dataCaixa">
-                </div>
-
-                <div class="form-group">
-                  <label>Valor inicial</label>
-                  <input type="number" id="valorInicial" step="0.01">
-                </div>
-              </div>
-
-              <button type="button" id="btnAbrirCaixa">
-                Abrir Caixa
-              </button>
-
-              <p id="mensagem"></p>
-            </div>
-          </div>
-
-          <aside class="side-panel">
-            <h2>Produtos (prévia)</h2>
-
-            <div id="listaProdutos">
-              <p>Nenhum produto carregado.</p>
-            </div>
-
-            <button id="btnCarregarProdutos" class="btn-primary btn-ghost">
-              Carregar Produtos
-            </button>
-          </aside>
-        </section>
-
       </main>
     </div>
   </div>
