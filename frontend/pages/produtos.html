@@ -10,18 +10,20 @@
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <div class="logo">Bia Criativa</div>
+      <div class="logo">
+        <div class="logo-icon">BC</div>
+        <span class="logo-text">Bia Criativa</span>
+      </div>
       <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
-
       <nav class="menu">
-        <a href="../index.html">Dashboard</a>
-        <a href="caixa.html">Caixa</a>
-        <a href="vendas.html">Vendas</a>
-        <a href="#" class="active">Produtos</a>
-        <a href="estoque.html">Estoque</a>
-        <a href="relatorios.html">Relatórios</a>
-        <a href="usuarios.html">Usuários</a>
-        <a href="login.html">Entrar</a>
+        <a href="../index.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Dashboard</a>
+        <a href="caixa.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>Caixa</a>
+        <a href="vendas.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>Vendas</a>
+        <a href="#" class="active"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Produtos</a>
+        <a href="estoque.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>Estoque</a>
+        <a href="relatorios.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Relatórios</a>
+        <a href="usuarios.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Usuários</a>
+        <a href="login.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></span>Entrar</a>
       </nav>
     </aside>
 
@@ -34,16 +36,32 @@
         <section class="panel">
           <h2>Novo produto</h2>
           <form id="formNovoProduto">
-            <input type="text" id="npNome" placeholder="Nome" required>
-            <input type="number" id="npPreco" placeholder="Preço" min="0" step="0.01" required>
-            <input type="number" id="npEstoque" placeholder="Quantidade em estoque" min="0" step="1" required>
-            <select id="npTipo" required>
-              <option value="">Tipo</option>
-              <option value="proprio">Próprio</option>
-              <option value="consignado">Consignado</option>
-            </select>
+            <div class="panel-row">
+              <div class="form-group">
+                <label>Nome</label>
+                <input type="text" id="npNome" placeholder="Nome do produto" required>
+              </div>
+              <div class="form-group">
+                <label>Preço (R$)</label>
+                <input type="number" id="npPreco" placeholder="0,00" min="0" step="0.01" required>
+              </div>
+            </div>
+            <div class="panel-row">
+              <div class="form-group">
+                <label>Quantidade em estoque</label>
+                <input type="number" id="npEstoque" placeholder="0" min="0" step="1" required>
+              </div>
+              <div class="form-group">
+                <label>Tipo</label>
+                <select id="npTipo" required>
+                  <option value="">Selecione o tipo</option>
+                  <option value="proprio">Próprio</option>
+                  <option value="consignado">Consignado</option>
+                </select>
+              </div>
+            </div>
             <div id="npConsignadoExtras" class="panel-consignado" style="display: none;">
-              <p class="text-muted">Consignado: informe o UUID do artesão (tabela <code>artesaos</code> no banco) e o repasse, conforme o modelo do README.</p>
+              <p class="text-muted">Consignado: informe o UUID do artesão e o repasse conforme o modelo do README.</p>
               <input type="text" id="npArtesaoId" placeholder="UUID do artesão (opcional)" autocomplete="off">
               <select id="npTipoRepasse">
                 <option value="">Sem repasse neste cadastro</option>
@@ -53,7 +71,7 @@
               <input type="number" id="npPorcentagemRepasse" placeholder="Porcentagem (%)" min="0" step="0.01">
               <input type="number" id="npValorCusto" placeholder="Valor custo (repasse fixo)" min="0" step="0.01">
             </div>
-            <button type="submit">Cadastrar</button>
+            <button type="submit">Cadastrar Produto</button>
           </form>
           <p id="mensagemProduto"></p>
         </section>
@@ -61,13 +79,29 @@
         <section class="panel" id="panelEditar" style="display: none;">
           <h2>Editar produto</h2>
           <input type="hidden" id="editProdutoId">
-          <input type="text" id="editNome" placeholder="Nome">
-          <input type="number" id="editPreco" placeholder="Preço" min="0" step="0.01">
-          <input type="number" id="editEstoque" placeholder="Quantidade em estoque" min="0" step="1">
-          <select id="editTipo">
-            <option value="proprio">Próprio</option>
-            <option value="consignado">Consignado</option>
-          </select>
+          <div class="panel-row">
+            <div class="form-group">
+              <label>Nome</label>
+              <input type="text" id="editNome" placeholder="Nome">
+            </div>
+            <div class="form-group">
+              <label>Preço (R$)</label>
+              <input type="number" id="editPreco" placeholder="0,00" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="panel-row">
+            <div class="form-group">
+              <label>Quantidade em estoque</label>
+              <input type="number" id="editEstoque" placeholder="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>Tipo</label>
+              <select id="editTipo">
+                <option value="proprio">Próprio</option>
+                <option value="consignado">Consignado</option>
+              </select>
+            </div>
+          </div>
           <div id="editConsignadoExtras" class="panel-consignado" style="display: none;">
             <input type="text" id="editArtesaoId" placeholder="UUID do artesão" autocomplete="off">
             <select id="editTipoRepasse">
@@ -78,31 +112,52 @@
             <input type="number" id="editPorcentagemRepasse" placeholder="Porcentagem (%)" min="0" step="0.01">
             <input type="number" id="editValorCusto" placeholder="Valor custo (repasse fixo)" min="0" step="0.01">
           </div>
-          <button type="button" id="btnSalvarEdicao">Salvar alterações</button>
-          <button type="button" id="btnCancelarEdicao" class="btn-ghost">Cancelar</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button type="button" id="btnSalvarEdicao">Salvar alterações</button>
+            <button type="button" id="btnCancelarEdicao" class="btn-ghost">Cancelar</button>
+          </div>
           <p id="mensagemEditar"></p>
         </section>
 
         <section class="panel" id="panelMovimentar">
           <h2>Movimentar estoque</h2>
-          <p class="text-muted">Registra linhas em <code>movimentacoes_estoque</code> (histórico). O efeito em <code>produtos.quantidade_estoque</code> depende dos triggers no banco (ver README do database).</p>
-          <select id="movProdutoSelect">
-            <option value="">Carregue a lista de produtos antes</option>
-          </select>
-          <select id="movTipo">
-            <option value="entrada">Entrada</option>
-            <option value="saida">Saída</option>
-          </select>
-          <input type="number" id="movQtd" placeholder="Quantidade" min="1" step="1">
-          <input type="text" id="movMotivo" placeholder="Motivo (opcional)">
+          <p class="text-muted">Registra linhas em <code>movimentacoes_estoque</code>. O efeito em <code>produtos.quantidade_estoque</code> depende dos triggers no banco.</p>
+          <div class="panel-row">
+            <div class="form-group">
+              <label>Produto</label>
+              <select id="movProdutoSelect">
+                <option value="">Carregue a lista antes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tipo</label>
+              <select id="movTipo">
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel-row">
+            <div class="form-group">
+              <label>Quantidade</label>
+              <input type="number" id="movQtd" placeholder="1" min="1" step="1">
+            </div>
+            <div class="form-group">
+              <label>Motivo (opcional)</label>
+              <input type="text" id="movMotivo" placeholder="Ex: reposição">
+            </div>
+          </div>
           <button type="button" id="btnMovimentar">Registrar movimentação</button>
           <p id="msgMovimentacao"></p>
         </section>
 
         <section class="panel">
           <h2>Lista de Produtos</h2>
-          <button type="button" id="btnCarregarProdutos">Carregar Produtos</button>
-          <div id="listaProdutos"></div>
+          <button type="button" id="btnCarregarProdutos">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
+            Carregar Produtos
+          </button>
+          <div id="listaProdutos" style="margin-top:16px"></div>
         </section>
       </main>
     </div>
