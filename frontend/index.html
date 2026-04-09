@@ -3,25 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bia Criativa</title>
+  <title>Bia Criativa - Dashboard</title>
+
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <div class="layout">
+
     <aside class="sidebar">
-      <div class="logo">Bia Criativa</div>
-      <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
+      <div class="logo">
+        <div class="logo-icon">BC</div>
+        <span class="logo-text">Bia Criativa</span>
+      </div>
+
+      <p class="sidebar-user">
+        Operador: <span id="usuarioLogado">—</span>
+      </p>
 
       <nav class="menu">
-        <a href="#" class="active">Dashboard</a>
-        <a href="pages/caixa.html">Caixa</a>
-        <a href="pages/vendas.html">Vendas</a>
-        <a href="pages/produtos.html">Produtos</a>
-        <a href="pages/estoque.html">Estoque</a>
-        <a href="pages/relatorios.html">Relatórios</a>
-        <a href="pages/usuarios.html">Usuários</a>
-        <a href="pages/login.html">Entrar</a>
+        <p class="nav-label">Principal</p>
+
+        <a href="#" class="active">
+          <div class="nav-icon"><i class="fa-solid fa-chart-pie"></i></div>
+          Dashboard
+        </a>
+
+        <a href="pages/caixa.html">
+          <div class="nav-icon"><i class="fa-solid fa-cash-register"></i></div>
+          Caixa
+        </a>
+
+        <a href="pages/vendas.html">
+          <div class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+          Vendas
+        </a>
+
+        <a href="pages/produtos.html">
+          <div class="nav-icon"><i class="fa-solid fa-box"></i></div>
+          Produtos
+        </a>
+
+        <a href="pages/estoque.html">
+          <div class="nav-icon"><i class="fa-solid fa-warehouse"></i></div>
+          Estoque
+        </a>
+
+        <a href="pages/relatorios.html">
+          <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          Relatórios
+        </a>
+
+        <a href="pages/usuarios.html">
+          <div class="nav-icon"><i class="fa-solid fa-users"></i></div>
+          Usuários
+        </a>
+
+        <p class="nav-label">Sistema</p>
+
+        <a href="pages/login.html">
+          <div class="nav-icon"><i class="fa-solid fa-user-check"></i></div>
+          Entrar
+        </a>
       </nav>
     </aside>
 
@@ -31,39 +75,80 @@
       </header>
 
       <main class="main-content">
+
         <section class="cards">
           <div class="card">
-            <p class="card-title">Caixa Atual</p>
-            <h2 id="dashCaixaStatus">—</h2>
-            <span class="card-info" id="dashCaixaInfo">Carregando…</span>
+            <div class="card-header">
+              <span class="card-title">Caixa Atual</span>
+              <div class="card-icon icon-blue">
+                <i class="fa-solid fa-lock"></i>
+              </div>
+            </div>
+            <h2 id="dashCaixaStatus">Fechado</h2>
+            <p id="dashCaixaInfo" class="card-info">Abra o caixa abaixo</p>
           </div>
 
           <div class="card">
-            <p class="card-title">Total Vendido (caixa)</p>
-            <h2 id="dashTotalVendido">—</h2>
-            <span class="card-info" id="dashVendasInfo">—</span>
+            <div class="card-header">
+              <span class="card-title">Total Vendido (caixa)</span>
+              <div class="card-icon icon-green">
+                <i class="fa-solid fa-money-bill-wave"></i>
+              </div>
+            </div>
+            <h2 id="dashTotalVendido">R$ 0,00</h2>
+            <p id="dashVendasInfo" class="card-info">—</p>
           </div>
 
           <div class="card">
-            <p class="card-title">Vendas (caixa)</p>
-            <h2 id="dashQtdVendas">—</h2>
-            <span class="card-info">No caixa aberto</span>
+            <div class="card-header">
+              <span class="card-title">Vendas (caixa)</span>
+              <div class="card-icon icon-amber">
+                <i class="fa-solid fa-chart-line"></i>
+              </div>
+            </div>
+            <h2 id="dashQtdVendas">0</h2>
+            <p class="card-info">No caixa aberto</p>
           </div>
         </section>
 
-        <section class="panel">
-          <h2>Abertura de Caixa</h2>
-          <input type="date" id="dataCaixa">
-          <input type="number" id="valorInicial" placeholder="Valor inicial" min="0" step="0.01">
-          <button type="button" id="btnAbrirCaixa">Abrir Caixa</button>
-          <p id="mensagem"></p>
+        <section class="dashboard-grid">
+          <div class="dashboard-main">
+            <div class="panel">
+              <h2>Abertura de Caixa</h2>
+
+              <div class="panel-row">
+                <div class="form-group">
+                  <label>Data</label>
+                  <input type="date" id="dataCaixa">
+                </div>
+
+                <div class="form-group">
+                  <label>Valor inicial</label>
+                  <input type="number" id="valorInicial" step="0.01">
+                </div>
+              </div>
+
+              <button type="button" id="btnAbrirCaixa">
+                Abrir Caixa
+              </button>
+
+              <p id="mensagem"></p>
+            </div>
+          </div>
+
+          <aside class="side-panel">
+            <h2>Produtos (prévia)</h2>
+
+            <div id="listaProdutos">
+              <p>Nenhum produto carregado.</p>
+            </div>
+
+            <button id="btnCarregarProdutos" class="btn-primary btn-ghost">
+              Carregar Produtos
+            </button>
+          </aside>
         </section>
 
-        <section class="panel">
-          <h2>Produtos (prévia)</h2>
-          <button type="button" id="btnCarregarProdutos">Carregar Produtos</button>
-          <div id="listaProdutos"></div>
-        </section>
       </main>
     </div>
   </div>
