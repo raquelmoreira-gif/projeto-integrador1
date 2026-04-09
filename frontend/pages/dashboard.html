@@ -3,100 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bia Criativa - Painel de Controle</title>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>Bia Criativa - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="layout">
         <aside class="sidebar">
-            <div class="brand">
-                <i class="ph ph-intersect-three"></i>
-                <span>Bia Criativa</span>
+            <div class="logo">
+                <div class="logo-icon">BC</div>
+                <span class="logo-text">Bia Criativa</span>
             </div>
             
-            <div class="user-info">
-                <p>Operador: <strong>Não identificado</strong></p>
-                <a href="#">Sair</a>
+            <div class="sidebar-user">
+                Operador: <span>Não identificado</span>
+                <a href="#" class="link-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
             </div>
 
             <nav class="menu">
-                <a href="#" class="active"><i class="ph ph-layout"></i> Dashboard</a>
-                <a href="#"><i class="ph ph-cash-register"></i> Caixa</a>
-                <a href="#"><i class="ph ph-chart-line-up"></i> Vendas</a>
-                <a href="#"><i class="ph ph-shopping-cart"></i> Produtos</a>
-                <a href="#"><i class="ph ph-package"></i> Estoque</a>
-                <a href="#"><i class="ph ph-chart-bar"></i> Relatórios</a>
-                <a href="#"><i class="ph ph-users"></i> Usuários</a>
-                <a href="#" class="btn-entrar"><i class="ph ph-sign-in"></i> Entrar</a>
+                <p class="nav-label">Principal</p>
+                <a href="dashboard.html" class="active">
+                    <div class="nav-icon"><i class="fa-solid fa-chart-pie"></i></div> Dashboard
+                </a>
+                <a href="#">
+                    <div class="nav-icon"><i class="fa-solid fa-cash-register"></i></div> Caixa
+                </a>
+                <a href="#">
+                    <div class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></div> Vendas
+                </a>
+                <a href="#">
+                    <div class="nav-icon"><i class="fa-solid fa-box"></i></div> Produtos
+                </a>
+                <a href="#">
+                    <div class="nav-icon"><i class="fa-solid fa-warehouse"></i></div> Estoque
+                </a>
+                <a href="#">
+                    <div class="nav-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div> Relatórios
+                </a>
+                <a href="#">
+                    <div class="nav-icon"><i class="fa-solid fa-users"></i></div> Usuários
+                </a>
+                <p class="nav-label">Sistema</p>
+                <a href="#">
+                    <div class="nav-icon"><i class="fa-solid fa-user-check"></i></div> Entrar
+                </a>
             </nav>
         </aside>
 
-        <main class="main-content">
-            <header class="page-header">
+        <main class="content-area">
+            <header class="header">
                 <h1>Painel de Controle</h1>
             </header>
 
-            <section class="stats-grid">
-                <div class="card card-status">
-                    <div class="card-header">
-                        <span>Caixa Atual</span>
-                        <i class="ph ph-lock-simple"></i>
+            <div class="main-content">
+                <section class="cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Caixa Atual</span>
+                            <div class="card-icon icon-blue"><i class="fa-solid fa-lock"></i></div>
+                        </div>
+                        <h2>Fechado <span class="card-badge badge-closed">Fechado</span></h2>
+                        <p class="card-info">Abra o caixa na página Caixa</p>
                     </div>
-                    <div class="card-body">
-                        <h2>Fechado <span class="badge">Fechado</span></h2>
-                        <p>Abra o caixa na página Caixa</p>
-                    </div>
-                </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <span>Total Vendido (caixa)</span>
-                        <i class="ph ph-money"></i>
-                    </div>
-                    <div class="card-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Total Vendido (caixa)</span>
+                            <div class="card-icon icon-green"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        </div>
                         <h2>R$ 0,00</h2>
-                        <p>—</p>
+                        <p class="card-info">—</p>
                     </div>
-                </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <span>Vendas (caixa)</span>
-                        <i class="ph ph-presentation-chart"></i>
-                    </div>
-                    <div class="card-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Vendas (caixa)</span>
+                            <div class="card-icon icon-amber"><i class="fa-solid fa-chart-line"></i></div>
+                        </div>
                         <h2>0</h2>
-                        <p>No caixa aberto</p>
+                        <p class="card-info">No caixa aberto</p>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section class="details-grid">
-                <div class="box box-abertura">
-                    <h3>Abertura de Caixa</h3>
-                    <form class="form-abertura">
-                        <div class="input-group">
-                            <label>Data de Abertura</label>
-                            <input type="date" value="2026-04-09">
+                <section class="dashboard-grid">
+                    <div class="dashboard-main">
+                        <div class="panel">
+                            <h2>Abertura de Caixa</h2>
+                            <form>
+                                <div class="panel-row">
+                                    <div class="form-group">
+                                        <label>Data de Abertura</label>
+                                        <input type="date" value="2026-04-09">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Valor Inicial (R$)</label>
+                                        <input type="number" step="0.01" placeholder="0,00">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary">Abrir Caixa</button>
+                            </form>
                         </div>
-                        <div class="input-group">
-                            <label>Valor Inicial (R$)</label>
-                            <input type="text" placeholder="0,00">
-                        </div>
-                        <button type="button" class="btn-abrir">Abrir Caixa</button>
-                    </form>
-                </div>
+                    </div>
 
-                <div class="box box-produtos">
-                    <h3>Produtos (prévia)</h3>
-                    <div class="empty-state">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" alt="Icone produtos" width="80">
+                    <aside class="side-panel">
+                        <h2>Produtos (prévia)</h2>
+                        <div class="card-icon icon-blue" style="width: 80px; height: 80px; font-size: 30px; margin: 20px auto;">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
                         <p>Nenhum produto carregado. Clique para visualizar.</p>
-                        <button class="btn-carregar">Carregar Produtos</button>
-                    </div>
-                </div>
-            </section>
+                        <button class="btn-primary btn-ghost">Carregar Produtos</button>
+                    </aside>
+                </section>
+            </div>
         </main>
     </div>
 </body>
