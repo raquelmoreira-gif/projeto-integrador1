@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const hoje = new Date().toISOString().split("T")[0];
 
   initSidebarUsuario();
-  initDashboard();
+  initDashboard(hoje);
   initCaixaPage(hoje);
   initProdutosPage();
   initVendasPage();
@@ -102,56 +102,55 @@ async function loadCaixaResumo(caixaId) {
   }
 }
 
-function initDashboard() {
+function initDashboard(hoje) {
   const elCaixa = document.getElementById("dashCaixaStatus");
   if (!elCaixa) return;
-
-  const hoje = new Date().toISOString().split("T")[0];
-
-  buscarCaixaAberto()
-    .then(async (caixa) => {
-      if (caixa) {
-        setText("dashCaixaStatus", "Aberto");
-        setText("dashCaixaInfo", `Data: ${caixa.data || "—"}`);
-        const resumo = await loadCaixaResumo(caixa.id);
-        const total = resumo ? Number(resumo.total_vendido) : 0;
-        const qtd = resumo ? Number(resumo.quantidade_vendas) : 0;
-        setText("dashTotalVendido", formatMoney(total));
-        setText("dashQtdVendas", String(qtd));
-        setText("dashVendasInfo", resumo ? "Caixa atual" : "Sem vendas ainda");
-      } else {
-        setText("dashCaixaStatus", "Fechado");
-        setText("dashCaixaInfo", "Abra o caixa na página Caixa");
-        setText("dashTotalVendido", formatMoney(0));
-        setText("dashQtdVendas", "0");
-        setText("dashVendasInfo", "—");
-      }
-    })
-    .catch(() => {
-      setText("dashCaixaStatus", "—");
-      setText("dashCaixaInfo", "Erro ao consultar API");
-    });
 
   const dataCaixa = document.getElementById("dataCaixa");
   const btnAbrir = document.getElementById("btnAbrirCaixa");
   const mensagem = document.getElementById("mensagem");
   const listaProdutos = document.getElementById("listaProdutos");
   const btnCarregar = document.getElementById("btnCarregarProdutos");
+  const btnFechar = document.getElementById("btnFecharCaixa");
+  const msgFechar = document.getElementById("mensagemFechar");
+  const inputFinal = document.getElementById("valorFinalCaixa");
 
   if (dataCaixa) dataCaixa.value = hoje;
 
-  if (mensagem && btnAbrir) {
-    buscarCaixaAberto()
-      .then((caixa) => {
-        if (caixa) {
-          mensagem.textContent = "Já existe um caixa aberto.";
-          btnAbrir.disabled = true;
-          btnAbrir.style.opacity = "0.6";
-          btnAbrir.style.cursor = "not-allowed";
-        }
-      })
-      .catch(() => {});
+  function refreshDashUi(caixa, resumo) {
+    if (caixa) {
+      setText("dashCaixaStatus", "Aberto");
+      setText("dashCaixaInfo", `Data: ${caixa.data || "—"}`);
+      const total = resumo ? Number(resumo.total_vendido) : 0;
+      const qtd = resumo ? Number(resumo.quantidade_vendas) : 0;
+      setText("dashTotalVendido", formatMoney(total));
+      setText("dashQtdVendas", String(qtd));
+      setText("dashVendasInfo", resumo ? "Caixa atual" : "Sem vendas ainda");
+    } else {
+      setText("dashCaixaStatus", "Fechado");
+      setText("dashCaixaInfo", "Abra o caixa abaixo");
+      setText("dashTotalVendido", formatMoney(0));
+      setText("dashQtdVendas", "0");
+      setText("dashVendasInfo", "—");
+    }
+    if (btnAbrir) {
+      btnAbrir.disabled = !!caixa;
+      btnAbrir.style.opacity = caixa ? "0.6" : "1";
+      btnAbrir.style.cursor = caixa ? "not-allowed" : "pointer";
+    }
+    if (mensagem && caixa) mensagem.textContent = "Caixa em operação.";
+    if (mensagem && !caixa) mensagem.textContent = "";
   }
+
+  buscarCaixaAberto()
+    .then(async (caixa) => {
+      const resumo = caixa ? await loadCaixaResumo(caixa.id) : null;
+      refreshDashUi(caixa, resumo);
+    })
+    .catch(() => {
+      setText("dashCaixaStatus", "—");
+      setText("dashCaixaInfo", "Erro ao consultar API");
+    });
 
   if (btnAbrir && mensagem) {
     btnAbrir.addEventListener("click", async () => {
@@ -164,12 +163,34 @@ function initDashboard() {
       try {
         await abrirCaixa(data, valor);
         mensagem.textContent = "Caixa aberto com sucesso!";
-        btnAbrir.disabled = true;
-        btnAbrir.style.opacity = "0.6";
-        btnAbrir.style.cursor = "not-allowed";
-        window.location.reload();
+        const caixa = await buscarCaixaAberto();
+        const resumo = caixa ? await loadCaixaResumo(caixa.id) : null;
+        refreshDashUi(caixa, resumo);
       } catch (e) {
         mensagem.textContent = e.message;
+      }
+    });
+  }
+
+  if (btnFechar && msgFechar && inputFinal) {
+    btnFechar.addEventListener("click", async () => {
+      const vf = inputFinal.value;
+      if (vf === "" || vf === null) {
+        msgFechar.textContent = "Informe o valor final.";
+        return;
+      }
+      try {
+        const caixa = await buscarCaixaAberto();
+        if (!caixa) {
+          msgFechar.textContent = "Não há caixa aberto.";
+          return;
+        }
+        await fecharCaixa(caixa.id, vf);
+        msgFechar.textContent = "Caixa fechado com sucesso.";
+        inputFinal.value = "";
+        refreshDashUi(null, null);
+      } catch (e) {
+        msgFechar.textContent = e.message;
       }
     });
   }
@@ -183,7 +204,7 @@ function initDashboard() {
 
 function initCaixaPage(hoje) {
   const dataCaixa = document.getElementById("dataCaixa");
-  if (!document.getElementById("btnFecharCaixa")) return;
+  if (!document.getElementById("caixaStatusTitulo")) return;
 
   if (dataCaixa) dataCaixa.value = hoje;
 
@@ -692,9 +713,7 @@ function initRelatoriosPage() {
       );
       const top = sorted[0];
 
-      let pix = 0,
-        din = 0,
-        card = 0;
+      let pix = 0, din = 0, card = 0;
       caixas.forEach((c) => {
         pix += Number(c.total_pix) || 0;
         din += Number(c.total_dinheiro) || 0;
@@ -709,22 +728,10 @@ function initRelatoriosPage() {
 
       setText("relTotalVendido", formatMoney(totalGeral));
       setText("relQtdVendas", String(qtdVendas));
-      setText(
-        "relTopProduto",
-        top ? top.nome : "—"
-      );
-      setText(
-        "relTopProdutoInfo",
-        top ? `${top.total_vendido} un.` : "Sem dados"
-      );
-      setText(
-        "relTopForma",
-        topForma && topForma.v > 0 ? topForma.k : "—"
-      );
-      setText(
-        "relTopFormaInfo",
-        topForma && topForma.v > 0 ? formatMoney(topForma.v) : "—"
-      );
+      setText("relTopProduto", top ? top.nome : "—");
+      setText("relTopProdutoInfo", top ? `${top.total_vendido} un.` : "Sem dados");
+      setText("relTopForma", topForma && topForma.v > 0 ? topForma.k : "—");
+      setText("relTopFormaInfo", topForma && topForma.v > 0 ? formatMoney(topForma.v) : "—");
 
       const payEl = document.getElementById("resumoPagamentos");
       if (payEl) {
