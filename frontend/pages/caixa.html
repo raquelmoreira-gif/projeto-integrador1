@@ -10,18 +10,20 @@
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <div class="logo">Bia Criativa</div>
+      <div class="logo">
+        <div class="logo-icon">BC</div>
+        <span class="logo-text">Bia Criativa</span>
+      </div>
       <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
-
       <nav class="menu">
-        <a href="../index.html">Dashboard</a>
-        <a href="#" class="active">Caixa</a>
-        <a href="vendas.html">Vendas</a>
-        <a href="produtos.html">Produtos</a>
-        <a href="estoque.html">Estoque</a>
-        <a href="relatorios.html">Relatórios</a>
-        <a href="usuarios.html">Usuários</a>
-        <a href="login.html">Entrar</a>
+        <a href="../index.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Dashboard</a>
+        <a href="#" class="active"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>Caixa</a>
+        <a href="vendas.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>Vendas</a>
+        <a href="produtos.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Produtos</a>
+        <a href="estoque.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>Estoque</a>
+        <a href="relatorios.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Relatórios</a>
+        <a href="usuarios.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Usuários</a>
+        <a href="login.html"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></span>Entrar</a>
       </nav>
     </aside>
 
@@ -33,13 +35,23 @@
       <main class="main-content">
         <section class="cards">
           <div class="card">
-            <p class="card-title">Status do Caixa</p>
+            <div class="card-header">
+              <p class="card-title">Status do Caixa</p>
+              <div class="card-icon icon-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              </div>
+            </div>
             <h2 id="caixaStatusTitulo">—</h2>
             <span class="card-info" id="caixaStatusInfo">Carregando…</span>
           </div>
 
           <div class="card">
-            <p class="card-title">Total vendido (caixa aberto)</p>
+            <div class="card-header">
+              <p class="card-title">Total vendido (caixa aberto)</p>
+              <div class="card-icon icon-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              </div>
+            </div>
             <h2 id="caixaTotalDia">—</h2>
             <span class="card-info" id="caixaTotalDiaInfo">—</span>
           </div>
@@ -47,16 +59,33 @@
 
         <section class="panel">
           <h2>Abertura de Caixa</h2>
-          <input type="date" id="dataCaixa">
-          <input type="number" id="valorInicial" placeholder="Valor inicial" min="0" step="0.01">
-          <button type="button" id="btnAbrirCaixa">Abrir Caixa</button>
+          <div class="panel-row">
+            <div class="form-group">
+              <label>Data</label>
+              <input type="date" id="dataCaixa">
+            </div>
+            <div class="form-group">
+              <label>Valor inicial (R$)</label>
+              <input type="number" id="valorInicial" placeholder="0,00" min="0" step="0.01">
+            </div>
+          </div>
+          <button type="button" id="btnAbrirCaixa">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Abrir Caixa
+          </button>
           <p id="mensagem"></p>
         </section>
 
         <section class="panel">
           <h2>Fechamento de Caixa</h2>
-          <input type="number" id="valorFinalCaixa" placeholder="Valor final contado" min="0" step="0.01">
-          <button type="button" id="btnFecharCaixa">Fechar Caixa</button>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Valor final contado (R$)</label>
+            <input type="number" id="valorFinalCaixa" placeholder="0,00" min="0" step="0.01">
+          </div>
+          <button type="button" id="btnFecharCaixa">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Fechar Caixa
+          </button>
           <p id="mensagemFechar"></p>
         </section>
       </main>
