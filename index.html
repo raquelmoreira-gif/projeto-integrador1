@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão Comercial</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="auth-container">
+        <div class="auth-card" id="login-card">
+            <h2>Faça Login na sua conta</h2>
+            <p>Insira seu email e senha para continuar</p>
+            <form id="form-login">
+                <label>Endereço de Email:</label>
+                <input type="email" id="login-email" required placeholder="exemplo@gmail.com">
+                <label>Senha:</label>
+                <input type="password" id="login-senha" required placeholder="••••••">
+                <button type="submit" class="btn-primary">Entrar</button>
+                <div class="switch-auth">Não possui conta? <a href="#" onclick="toggleAuth('register')">Criar conta</a></div>
+            </form>
+        </div>
+
+        <div class="auth-card hidden" id="register-card">
+            <h2>Crie sua conta</h2>
+            <p>Crie uma conta para continuar</p>
+            <form id="form-register">
+                <label>Endereço de email:</label>
+                <input type="email" required>
+                <label>Nome de usuário:</label>
+                <input type="text" required>
+                <label>Senha:</label>
+                <input type="password" required>
+                <div style="text-align: left; margin-bottom: 15px; font-size: 13px;">
+                    <input type="checkbox" required style="width: auto; margin-right: 5px;"> I accept terms and conditions
+                </div>
+                <button type="submit" class="btn-primary">Criar Conta</button>
+                <div class="switch-auth">Já possui conta? <a href="#" onclick="toggleAuth('login')">Entrar</a></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-container" class="hidden">
+        
+        <div class="sidebar">
+            <div class="sidebar-brand">Dashboard</div>
+            <div class="nav-item active" onclick="navigate('vendas')">Vendas</div>
+            <div class="nav-item" onclick="navigate('estoque')">Estoque</div>
+            <div class="nav-item" onclick="navigate('caixa')">Caixa</div>
+            <div class="nav-item" onclick="navigate('relatorio')">Relatório</div>
+            <div class="nav-item" onclick="logout()" style="margin-top: auto;">Logout</div>
+        </div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <input type="text" placeholder="Pesquisar...">
+                <div class="user-profile">
+                    <span>Usuário Admin</span>
+                </div>
+            </div>
+
+            <div id="view-vendas" class="view-section active">
+                <div class="view-header">
+                    <h2>Vendas</h2>
+                    <button class="btn-primary" style="width: auto;" onclick="openModal('modal-venda')">Registrar Nova Venda</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Produto</th><th>Valor</th><th>Quantidade</th><th>Data</th><th>Tipo</th><th>Artesão</th><th>Ações</th></tr>
+                        </thead>
+                        <tbody id="tbody-vendas"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-estoque" class="view-section">
+                <div class="view-header">
+                    <h2>Estoque</h2>
+                    <button class="btn-primary" style="width: auto;" onclick="openModal('modal-estoque')">Cadastrar Produto</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Produto</th><th>Valor (R$)</th><th>Quantidade</th><th>Tipo</th><th>Artesão</th><th>Ações</th></tr>
+                        </thead>
+                        <tbody id="tbody-estoque"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-caixa" class="view-section">
+                <h2>Caixa</h2>
+                <div class="caixa-cards">
+                    <div class="card-caixa card-entrada">
+                        <h3>Entrada</h3>
+                        <input type="number" id="caixa-entrada-val" placeholder="ex: R$ 20,00" step="0.01">
+                    </div>
+                    <div class="card-caixa card-saida">
+                        <h3>Saída</h3>
+                        <input type="number" id="caixa-saida-val" placeholder="ex: R$ 20,00" step="0.01">
+                    </div>
+                </div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <button class="btn-primary" style="width: 200px; background-color: #ccc; color: black;" onclick="registrarCaixa()">Fechar Caixa</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Data</th><th>Entrada</th><th>Saída</th><th>Resultado (Saldo do Dia)</th></tr>
+                        </thead>
+                        <tbody id="tbody-caixa"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-relatorio" class="view-section">
+                <h2>Relatório</h2>
+                <div class="report-toggles" style="margin-top: 20px;">
+                    <button id="btn-rep-semanal" class="active" onclick="setReportType('semanal')">Semanal</button>
+                    <button id="btn-rep-mensal" onclick="setReportType('mensal')">Mensal</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="financeChart" height="100"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modal-venda" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span id="venda-modal-title">Registrar Venda</span>
+                <span class="close-modal" onclick="closeModal('modal-venda')">X</span>
+            </div>
+            <form id="form-venda">
+                <input type="hidden" id="venda-id">
+                <label>Produto (Estoque):</label>
+                <select id="venda-produto" required></select>
+                
+                <label>Quantidade Vendida:</label>
+                <input type="number" id="venda-qtd" required min="1">
+                
+                <label>Tipo:</label>
+                <select id="venda-tipo" required onchange="toggleArtesao('venda')">
+                    <option value="Próprio">Próprio</option>
+                    <option value="Consignado">Consignado</option>
+                </select>
+
+                <div id="div-venda-artesao" class="hidden">
+                    <label>Nome do Artesão:</label>
+                    <input type="text" id="venda-artesao">
+                </div>
+
+                <button type="submit" class="btn-primary">Salvar Venda</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-estoque" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span id="estoque-modal-title">Cadastrar Produto</span>
+                <span class="close-modal" onclick="closeModal('modal-estoque')">X</span>
+            </div>
+            <form id="form-estoque">
+                <input type="hidden" id="est-id">
+                <label>Nome do Produto:</label>
+                <input type="text" id="est-nome" required>
+                
+                <label>Valor (R$):</label>
+                <input type="number" id="est-valor" required step="0.01" min="0">
+                
+                <label>Quantidade Inicial:</label>
+                <input type="number" id="est-qtd" required min="0">
+                
+                <label>Tipo:</label>
+                <select id="est-tipo" required onchange="toggleArtesao('estoque')">
+                    <option value="Próprio">Próprio</option>
+                    <option value="Consignado">Consignado</option>
+                </select>
+
+                <div id="div-est-artesao" class="hidden">
+                    <label>Nome do Artesão:</label>
+                    <input type="text" id="est-artesao">
+                </div>
+
+                <button type="submit" class="btn-primary">Salvar Produto</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
