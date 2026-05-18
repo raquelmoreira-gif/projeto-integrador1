@@ -26,10 +26,7 @@ function setText(id, text) {
   if (el) el.textContent = text;
 }
 
-/* ================= USUARIO
-   ATENÇÃO: auth.js usa as chaves "bia_usuario_id" / "bia_usuario_nome".
-   main.js agora usa as MESMAS chaves para não haver conflito.
-================= */
+/* ================= USUARIO ================= */
 
 function setUsuario(id, nome) {
   localStorage.setItem("bia_usuario_id", id);
@@ -79,7 +76,6 @@ function initLoginPage() {
         select.appendChild(opt);
       });
 
-      // Pré-seleciona o operador já logado, se houver
       const idAtual = getUsuarioId();
       if (idAtual) select.value = idAtual;
 
@@ -97,7 +93,6 @@ function initLoginPage() {
     const nome = select.selectedOptions[0].textContent.split(" (")[0];
     setUsuario(id, nome);
 
-    // Volta para o dashboard — compatível com estrutura pages/ e raiz
     const destino = window.location.pathname.includes("/pages/")
       ? "../index.html"
       : "index.html";
@@ -205,13 +200,17 @@ async function initDashboard() {
     };
   }
 
-  // Botão abrir caixa no dashboard (index.html)
+  // Botão abrir caixa no dashboard
   const btnAbrir = document.getElementById("btnAbrirCaixa");
   if (btnAbrir) {
     btnAbrir.onclick = async () => {
       const data  = document.getElementById("dataCaixa")?.value;
       const valor = document.getElementById("valorInicial")?.value;
       const msg   = document.getElementById("mensagem");
+      if (!data || valor === "" || valor === null) {
+        if (msg) msg.textContent = "❌ Preencha a data e o valor inicial.";
+        return;
+      }
       try {
         await abrirCaixa(data, valor);
         if (msg) msg.textContent = "✅ Caixa aberto!";
@@ -229,14 +228,11 @@ function initCaixaPage(hoje) {
   const btnAbrir  = document.getElementById("btnAbrirCaixa");
   const btnFechar = document.getElementById("btnFecharCaixa");
 
-  // Não está na página de caixa — sai
   if (!btnAbrir && !btnFechar) return;
 
-  // Preenche data com hoje se existir o campo
   const inputData = document.getElementById("dataCaixa");
   if (inputData && !inputData.value) inputData.value = hoje;
 
-  // Carrega status atual
   carregarStatusCaixa();
 
   async function carregarStatusCaixa() {
@@ -246,7 +242,6 @@ function initCaixaPage(hoje) {
         setText("caixaStatusTitulo", "Aberto");
         setText("caixaStatusInfo",   `Data: ${caixa.data || "—"} | Inicial: ${formatMoney(caixa.valor_inicial)}`);
 
-        // Tenta buscar total vendido no caixa aberto
         try {
           const rel   = await relatorioCaixa();
           const atual = rel.find(r => r.caixa_id === caixa.id);
@@ -292,7 +287,7 @@ function initCaixaPage(hoje) {
       const valorFinal = document.getElementById("valorFinalCaixa")?.value;
       const msg        = document.getElementById("mensagemFechar");
 
-      if (valorFinal === "" || valorFinal === null) {
+      if (valorFinal === "" || valorFinal === null || valorFinal === undefined) {
         if (msg) msg.textContent = "❌ Informe o valor final contado.";
         return;
       }
@@ -322,25 +317,23 @@ function initProdutosPage() {
 
   if (!lista && !form) return;
 
-  // Carrega lista e popula select de movimentação
   async function carregar() {
     try {
       const produtos = await listarProdutos();
 
-      // Lista visual
       if (lista) {
         if (!produtos.length) {
           lista.innerHTML = "<p>Nenhum produto cadastrado.</p>";
         } else {
           lista.innerHTML = produtos.map(p => `
-            <div class="produto-linha" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
               <div>
                 <strong>${p.nome}</strong>
                 <span style="margin-left:8px;font-size:12px;color:var(--text-muted)">${p.tipo}</span><br>
                 <span>${formatMoney(p.preco)}</span>
                 <span style="margin-left:12px;color:var(--text-muted);font-size:13px">Estoque: ${p.quantidade_estoque}</span>
               </div>
-              <button type="button" class="btn-ghost" style="font-size:12px;padding:4px 10px"
+              <button type="button" class="btn-ghost" style="font-size:12px;padding:4px 10px;margin-top:0"
                 onclick="abrirEditar('${p.id}','${p.nome.replace(/'/g,"\\'")}',${p.preco},${p.quantidade_estoque},'${p.tipo}')">
                 Editar
               </button>
@@ -368,13 +361,10 @@ function initProdutosPage() {
 
   carregar();
 
-  // Botão recarregar
   const btnCarregar = document.getElementById("btnCarregarProdutos");
   if (btnCarregar) btnCarregar.onclick = carregar;
 
-  // Formulário novo produto
   if (form) {
-    // Mostrar/ocultar campos consignado
     const npTipoSel = document.getElementById("npTipo");
     const extras    = document.getElementById("npConsignadoExtras");
     if (npTipoSel && extras) {
@@ -399,8 +389,10 @@ function initProdutosPage() {
 
       const tipoRep = document.getElementById("npTipoRepasse")?.value;
       if (tipoRep === "porcentagem") {
+        body.tipo_repasse = "porcentagem";
         body.porcentagem_repasse = Number(document.getElementById("npPorcentagemRepasse").value);
       } else if (tipoRep === "fixo") {
+        body.tipo_repasse = "fixo";
         body.valor_custo = Number(document.getElementById("npValorCusto").value);
       }
 
@@ -416,11 +408,11 @@ function initProdutosPage() {
     };
   }
 
-  // Edição de produto
-  const panelEditar   = document.getElementById("panelEditar");
-  const btnSalvar     = document.getElementById("btnSalvarEdicao");
-  const btnCancelar   = document.getElementById("btnCancelarEdicao");
-  const msgEditar     = document.getElementById("mensagemEditar");
+  // Edição
+  const panelEditar = document.getElementById("panelEditar");
+  const btnSalvar   = document.getElementById("btnSalvarEdicao");
+  const btnCancelar = document.getElementById("btnCancelarEdicao");
+  const msgEditar   = document.getElementById("mensagemEditar");
 
   window.abrirEditar = (id, nome, preco, estoque, tipo) => {
     if (!panelEditar) return;
@@ -432,8 +424,8 @@ function initProdutosPage() {
     panelEditar.style.display = "block";
     panelEditar.scrollIntoView({ behavior: "smooth" });
 
-    const editTipoSel   = document.getElementById("editTipo");
-    const editExtras    = document.getElementById("editConsignadoExtras");
+    const editTipoSel = document.getElementById("editTipo");
+    const editExtras  = document.getElementById("editConsignadoExtras");
     if (editTipoSel && editExtras) {
       editExtras.style.display = tipo === "consignado" ? "block" : "none";
       editTipoSel.onchange = () => {
@@ -471,8 +463,8 @@ function initProdutosPage() {
   }
 
   // Movimentação de estoque
-  const btnMov   = document.getElementById("btnMovimentar");
-  const msgMov   = document.getElementById("msgMovimentacao");
+  const btnMov = document.getElementById("btnMovimentar");
+  const msgMov = document.getElementById("msgMovimentacao");
 
   if (btnMov) {
     btnMov.onclick = async () => {
@@ -507,14 +499,11 @@ function initVendasPage() {
   const btnFinalizar = document.getElementById("btnFinalizarVenda");
   if (!btnFinalizar) return;
 
-  // Carrinho em memória: [ { produto_id, nome, preco, quantidade } ]
   let carrinho = [];
 
-  // Aviso de login
   const aviso = document.getElementById("avisoLoginVendas");
   if (aviso) aviso.style.display = getUsuarioId() ? "none" : "block";
 
-  // Carrega produtos no select
   async function carregarProdutos() {
     const sel = document.getElementById("selectProdutoVenda");
     if (!sel) return;
@@ -522,12 +511,14 @@ function initVendasPage() {
       const produtos = await listarProdutos();
       sel.innerHTML = '<option value="">Selecione o produto</option>';
       produtos.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p.id;
-        opt.dataset.nome  = p.nome;
-        opt.dataset.preco = p.preco;
-        opt.textContent   = `${p.nome} — ${formatMoney(p.preco)}`;
-        sel.appendChild(opt);
+        if (p.quantidade_estoque > 0) {
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.dataset.nome  = p.nome;
+          opt.dataset.preco = p.preco;
+          opt.textContent   = `${p.nome} — ${formatMoney(p.preco)} (estoque: ${p.quantidade_estoque})`;
+          sel.appendChild(opt);
+        }
       });
     } catch (e) {
       console.error("Erro ao carregar produtos:", e.message);
@@ -536,7 +527,6 @@ function initVendasPage() {
 
   carregarProdutos();
 
-  // Atualiza lista visual do carrinho
   function renderCarrinho() {
     const lista = document.getElementById("listaVenda");
     setText("qtdItensVenda", carrinho.reduce((s, i) => s + i.quantidade, 0));
@@ -553,7 +543,7 @@ function initVendasPage() {
     lista.innerHTML = carrinho.map((item, idx) => `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
         <span><strong>${item.nome}</strong> × ${item.quantidade} = ${formatMoney(item.preco * item.quantidade)}</span>
-        <button type="button" class="btn-ghost" style="font-size:12px;padding:3px 8px;color:red"
+        <button type="button" class="btn-ghost" style="font-size:12px;padding:3px 8px;color:red;margin-top:0"
           onclick="removerItemCarrinho(${idx})">Remover</button>
       </div>
     `).join("");
@@ -566,7 +556,6 @@ function initVendasPage() {
 
   renderCarrinho();
 
-  // Adicionar produto ao carrinho
   const btnAdicionar = document.getElementById("btnAdicionarProduto");
   if (btnAdicionar) {
     btnAdicionar.onclick = () => {
@@ -594,10 +583,9 @@ function initVendasPage() {
     };
   }
 
-  // Finalizar venda
   btnFinalizar.onclick = async () => {
-    const uid  = getUsuarioId();
-    const msg  = document.getElementById("mensagemVenda");
+    const uid   = getUsuarioId();
+    const msg   = document.getElementById("mensagemVenda");
     const forma = document.getElementById("formaPagamento")?.value;
 
     if (!uid) {
@@ -617,8 +605,8 @@ function initVendasPage() {
 
     try {
       await criarVenda({
-        usuario_id:       uid,
-        forma_pagamento:  forma,
+        usuario_id:      uid,
+        forma_pagamento: forma,
         itens: carrinho.map(i => ({
           produto_id: i.produto_id,
           quantidade: i.quantidade
@@ -654,7 +642,7 @@ function initRelatoriosPage() {
         relatorioConsignado().catch(() => [])
       ]);
 
-      // Cards de topo
+      // Cards de topo — campos corretos da view relatorio_vendas_dia
       let total = 0, qtd = 0;
       dias.forEach(d => {
         total += Number(d.total_vendido || 0);
@@ -663,77 +651,95 @@ function initRelatoriosPage() {
       setText("relTotalVendido", formatMoney(total));
       setText("relQtdVendas",    qtd);
 
-      const topProd = [...produtos].sort((a, b) => b.total_vendido - a.total_vendido)[0];
+      // Produto mais vendido — campo correto: total_vendido (quantidade)
+      const topProd = [...produtos].sort((a, b) => Number(b.total_vendido) - Number(a.total_vendido))[0];
       setText("relTopProduto",     topProd?.nome || "—");
-      setText("relTopProdutoInfo", topProd ? `${topProd.quantidade_total || topProd.total_vendido} vendidos` : "—");
+      setText("relTopProdutoInfo", topProd ? `${topProd.total_vendido} un. vendidas` : "—");
 
-      // Forma de pagamento mais usada
-      const formaCounts = {};
+      // Forma de pagamento mais usada — soma totais por forma nos caixas
+      const formaTotais = {};
       caixas.forEach(c => {
-        if (c.forma_pagamento) {
-          formaCounts[c.forma_pagamento] = (formaCounts[c.forma_pagamento] || 0) + (Number(c.quantidade_vendas) || 1);
-        }
+        const formas = {
+          dinheiro: Number(c.total_dinheiro || 0),
+          pix:      Number(c.total_pix || 0),
+          cartao:   Number(c.total_cartao || 0),
+        };
+        Object.entries(formas).forEach(([f, v]) => {
+          formaTotais[f] = (formaTotais[f] || 0) + v;
+        });
       });
-      const topFormaEntry = Object.entries(formaCounts).sort((a, b) => b[1] - a[1])[0];
+      const topFormaEntry = Object.entries(formaTotais).sort((a, b) => b[1] - a[1])[0];
       setText("relTopForma",     topFormaEntry ? topFormaEntry[0] : "—");
-      setText("relTopFormaInfo", topFormaEntry ? `${topFormaEntry[1]} uso(s)` : "—");
+      setText("relTopFormaInfo", topFormaEntry ? formatMoney(topFormaEntry[1]) : "—");
 
-      // Tabela resumo por forma de pagamento
+      // Resumo por forma de pagamento
       const resumoEl = document.getElementById("resumoPagamentos");
       if (resumoEl) {
         if (!caixas.length) {
           resumoEl.innerHTML = "<p>Nenhum dado.</p>";
         } else {
-          const formas = {};
+          // Agrega totais dos campos da view relatorio_caixa
+          let totDinheiro = 0, totPix = 0, totCartao = 0, totVendas = 0, totGeral = 0;
           caixas.forEach(c => {
-            const f = c.forma_pagamento || "—";
-            if (!formas[f]) formas[f] = { total: 0, qtd: 0 };
-            formas[f].total += Number(c.total_vendido || 0);
-            formas[f].qtd   += Number(c.quantidade_vendas || 0);
+            totDinheiro += Number(c.total_dinheiro || 0);
+            totPix      += Number(c.total_pix || 0);
+            totCartao   += Number(c.total_cartao || 0);
+            totVendas   += Number(c.quantidade_vendas || 0);
+            totGeral    += Number(c.total_vendido || 0);
           });
+
           resumoEl.innerHTML = `
             <table style="width:100%;border-collapse:collapse;font-size:14px">
               <thead>
                 <tr style="border-bottom:2px solid var(--border)">
                   <th style="text-align:left;padding:8px 4px">Forma</th>
-                  <th style="text-align:right;padding:8px 4px">Vendas</th>
                   <th style="text-align:right;padding:8px 4px">Total</th>
                 </tr>
               </thead>
               <tbody>
-                ${Object.entries(formas).map(([f, v]) => `
-                  <tr style="border-bottom:1px solid var(--border)">
-                    <td style="padding:8px 4px;text-transform:capitalize">${f}</td>
-                    <td style="padding:8px 4px;text-align:right">${v.qtd}</td>
-                    <td style="padding:8px 4px;text-align:right">${formatMoney(v.total)}</td>
-                  </tr>
-                `).join("")}
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:8px 4px">Dinheiro</td>
+                  <td style="padding:8px 4px;text-align:right">${formatMoney(totDinheiro)}</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:8px 4px">Pix</td>
+                  <td style="padding:8px 4px;text-align:right">${formatMoney(totPix)}</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:8px 4px">Cartão (créd/déb)</td>
+                  <td style="padding:8px 4px;text-align:right">${formatMoney(totCartao)}</td>
+                </tr>
+                <tr style="font-weight:700">
+                  <td style="padding:8px 4px">Total geral (${totVendas} vendas)</td>
+                  <td style="padding:8px 4px;text-align:right">${formatMoney(totGeral)}</td>
+                </tr>
               </tbody>
             </table>`;
         }
       }
 
-      // Produtos em destaque
+      // Produtos em destaque — campos: nome, total_vendido (qtd), faturamento
       const prodEl = document.getElementById("relatorioProdutos");
       if (prodEl) {
         if (!produtos.length) {
           prodEl.innerHTML = "<p>Nenhum dado.</p>";
         } else {
+          const sorted = [...produtos].sort((a, b) => Number(b.total_vendido) - Number(a.total_vendido));
           prodEl.innerHTML = `
             <table style="width:100%;border-collapse:collapse;font-size:14px">
               <thead>
                 <tr style="border-bottom:2px solid var(--border)">
                   <th style="text-align:left;padding:8px 4px">Produto</th>
                   <th style="text-align:right;padding:8px 4px">Qtd vendida</th>
-                  <th style="text-align:right;padding:8px 4px">Total</th>
+                  <th style="text-align:right;padding:8px 4px">Faturamento</th>
                 </tr>
               </thead>
               <tbody>
-                ${produtos.slice(0, 10).map(p => `
+                ${sorted.slice(0, 10).map(p => `
                   <tr style="border-bottom:1px solid var(--border)">
-                    <td style="padding:8px 4px">${p.nome || p.produto_nome || "—"}</td>
-                    <td style="padding:8px 4px;text-align:right">${p.quantidade_total || "—"}</td>
-                    <td style="padding:8px 4px;text-align:right">${formatMoney(p.total_vendido)}</td>
+                    <td style="padding:8px 4px">${p.nome || "—"}</td>
+                    <td style="padding:8px 4px;text-align:right">${p.total_vendido ?? "—"}</td>
+                    <td style="padding:8px 4px;text-align:right">${formatMoney(p.faturamento)}</td>
                   </tr>
                 `).join("")}
               </tbody>
@@ -741,7 +747,7 @@ function initRelatoriosPage() {
         }
       }
 
-      // Consignado
+      // Consignado — campos: artesao, produto, vendido, faturamento
       const consEl = document.getElementById("relatorioConsignado");
       if (consEl) {
         if (!consignado.length) {
@@ -751,17 +757,19 @@ function initRelatoriosPage() {
             <table style="width:100%;border-collapse:collapse;font-size:14px">
               <thead>
                 <tr style="border-bottom:2px solid var(--border)">
-                  <th style="text-align:left;padding:8px 4px">Artesão / Produto</th>
+                  <th style="text-align:left;padding:8px 4px">Artesão</th>
+                  <th style="text-align:left;padding:8px 4px">Produto</th>
                   <th style="text-align:right;padding:8px 4px">Qtd</th>
-                  <th style="text-align:right;padding:8px 4px">Total</th>
+                  <th style="text-align:right;padding:8px 4px">Faturamento</th>
                 </tr>
               </thead>
               <tbody>
                 ${consignado.map(c => `
                   <tr style="border-bottom:1px solid var(--border)">
-                    <td style="padding:8px 4px">${c.nome || c.produto_nome || "—"}</td>
-                    <td style="padding:8px 4px;text-align:right">${c.quantidade_total || "—"}</td>
-                    <td style="padding:8px 4px;text-align:right">${formatMoney(c.total_vendido)}</td>
+                    <td style="padding:8px 4px">${c.artesao || "—"}</td>
+                    <td style="padding:8px 4px">${c.produto || "—"}</td>
+                    <td style="padding:8px 4px;text-align:right">${c.vendido ?? "—"}</td>
+                    <td style="padding:8px 4px;text-align:right">${formatMoney(c.faturamento)}</td>
                   </tr>
                 `).join("")}
               </tbody>
@@ -799,18 +807,14 @@ function initEstoquePage() {
               <thead>
                 <tr style="border-bottom:2px solid var(--border)">
                   <th style="text-align:left;padding:8px 4px">Produto</th>
-                  <th style="text-align:left;padding:8px 4px">Tipo</th>
                   <th style="text-align:right;padding:8px 4px">Qtd</th>
-                  <th style="text-align:right;padding:8px 4px">Preço</th>
                 </tr>
               </thead>
               <tbody>
                 ${estoque.map(p => `
                   <tr style="border-bottom:1px solid var(--border)">
                     <td style="padding:8px 4px">${p.nome || "—"}</td>
-                    <td style="padding:8px 4px;text-transform:capitalize">${p.tipo || "—"}</td>
-                    <td style="padding:8px 4px;text-align:right;font-weight:${p.quantidade_estoque <= 2 ? "bold;color:red" : "normal"}">${p.quantidade_estoque}</td>
-                    <td style="padding:8px 4px;text-align:right">${formatMoney(p.preco)}</td>
+                    <td style="padding:8px 4px;text-align:right;${p.quantidade_estoque <= 2 ? 'color:red;font-weight:700' : ''}">${p.quantidade_estoque}</td>
                   </tr>
                 `).join("")}
               </tbody>
