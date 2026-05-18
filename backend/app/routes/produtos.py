@@ -7,8 +7,6 @@ from app.services.supabase_client import get_supabase
 
 produtos_bp = Blueprint("produtos", __name__, url_prefix="/api/produtos")
 
-
-# CORREÇÃO: era @produtos_bp.get("/") — a barra extra causava 404/redirect em produção
 @produtos_bp.get("")
 def listar_produtos():
     try:
