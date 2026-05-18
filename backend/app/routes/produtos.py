@@ -8,7 +8,8 @@ from app.services.supabase_client import get_supabase
 produtos_bp = Blueprint("produtos", __name__, url_prefix="/api/produtos")
 
 
-@produtos_bp.get("/")
+# CORREÇÃO: era @produtos_bp.get("/") — a barra extra causava 404/redirect em produção
+@produtos_bp.get("")
 def listar_produtos():
     try:
         supabase = get_supabase()
@@ -67,7 +68,6 @@ def movimentar_estoque(produto_id: UUID):
 
     sb = get_supabase()
 
-    # Busca estoque atual
     produto_result = (
         sb.table("produtos")
         .select("id, quantidade_estoque")
@@ -91,7 +91,6 @@ def movimentar_estoque(produto_id: UUID):
     else:
         novo_estoque = estoque_atual + quantidade
 
-    # Registra movimentação
     mov_result = (
         sb.table("movimentacoes_estoque")
         .insert(
@@ -108,7 +107,6 @@ def movimentar_estoque(produto_id: UUID):
     if not mov_result.data:
         return fail("Erro ao registrar movimentacao", 500)
 
-    # Atualiza quantidade_estoque no produto
     upd_result = (
         sb.table("produtos")
         .update({"quantidade_estoque": novo_estoque})
