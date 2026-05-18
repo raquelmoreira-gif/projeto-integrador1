@@ -12,7 +12,7 @@ produtos_bp = Blueprint("produtos", __name__, url_prefix="/api/produtos")
 def listar_produtos():
     try:
         supabase = get_supabase()
-        response = supabase.table("produtos").select("*").execute()
+        response = supabase.table("produtos").select("*").order("nome").execute()
         return ok(response.data)
     except Exception as e:
         return fail(str(e))
@@ -25,6 +25,9 @@ def criar_produto():
     missing = [field for field in required if body.get(field) is None]
     if missing:
         return fail(f"Campos obrigatorios ausentes: {', '.join(missing)}", 422)
+
+    if body.get("tipo") not in ["proprio", "consignado"]:
+        return fail("Tipo deve ser 'proprio' ou 'consignado'", 422)
 
     sb = get_supabase()
     result = sb.table("produtos").insert(body).execute()
@@ -53,11 +56,43 @@ def movimentar_estoque(produto_id: UUID):
 
     if tipo not in ["entrada", "saida"]:
         return fail("Campo tipo deve ser 'entrada' ou 'saida'", 422)
-    if quantidade is None or quantidade <= 0:
+
+    try:
+        quantidade = int(quantidade)
+    except (TypeError, ValueError):
+        return fail("Campo quantidade deve ser um numero inteiro", 422)
+
+    if quantidade <= 0:
         return fail("Campo quantidade deve ser maior que zero", 422)
 
     sb = get_supabase()
-    result = (
+
+    # Busca estoque atual
+    produto_result = (
+        sb.table("produtos")
+        .select("id, quantidade_estoque")
+        .eq("id", str(produto_id))
+        .limit(1)
+        .execute()
+    )
+
+    if not produto_result.data:
+        return fail("Produto nao encontrado", 404)
+
+    estoque_atual = produto_result.data[0]["quantidade_estoque"]
+
+    if tipo == "saida":
+        if estoque_atual < quantidade:
+            return fail(
+                f"Estoque insuficiente. Disponivel: {estoque_atual}, solicitado: {quantidade}",
+                400,
+            )
+        novo_estoque = estoque_atual - quantidade
+    else:
+        novo_estoque = estoque_atual + quantidade
+
+    # Registra movimentação
+    mov_result = (
         sb.table("movimentacoes_estoque")
         .insert(
             {
@@ -69,4 +104,25 @@ def movimentar_estoque(produto_id: UUID):
         )
         .execute()
     )
-    return ok(result.data, 201)
+
+    if not mov_result.data:
+        return fail("Erro ao registrar movimentacao", 500)
+
+    # Atualiza quantidade_estoque no produto
+    upd_result = (
+        sb.table("produtos")
+        .update({"quantidade_estoque": novo_estoque})
+        .eq("id", str(produto_id))
+        .execute()
+    )
+
+    if not upd_result.data:
+        return fail("Movimentacao registrada mas falha ao atualizar estoque do produto", 500)
+
+    return ok(
+        {
+            "movimentacao": mov_result.data[0],
+            "produto": upd_result.data[0],
+        },
+        201,
+    )
