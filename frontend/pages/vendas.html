@@ -11,7 +11,11 @@
   <div class="layout">
     <aside class="sidebar">
       <div class="logo">
-        <div class="logo-icon">BC</div>
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>
+        </div>
         <span class="logo-text">Bia Criativa</span>
       </div>
       <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
@@ -72,7 +76,7 @@
             </div>
             <div class="form-group">
               <label>Quantidade</label>
-              <input type="number" id="quantidadeProduto" placeholder="1" min="1" step="1">
+              <input type="number" id="quantidadeProduto" placeholder="1" min="1" step="1" value="1">
             </div>
           </div>
           <button type="button" id="btnAdicionarProduto">
