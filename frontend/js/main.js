@@ -69,6 +69,13 @@ function initLoginPage() {
     try {
       const users = await listarUsuarios();
       select.innerHTML = '<option value="">Selecione o operador</option>';
+
+      if (!users || users.length === 0) {
+        select.innerHTML = '<option value="">Nenhum usuário cadastrado</option>';
+        if (msg) msg.textContent = "⚠️ Cadastre um usuário primeiro em Usuários.";
+        return;
+      }
+
       users.forEach(u => {
         const opt = document.createElement("option");
         opt.value = u.id;
@@ -80,18 +87,19 @@ function initLoginPage() {
       if (idAtual) select.value = idAtual;
 
     } catch (e) {
-      if (msg) msg.textContent = "Erro ao carregar usuários: " + e.message;
+      if (msg) msg.textContent = "❌ Erro ao carregar usuários: " + e.message;
     }
   }
 
   btn.onclick = () => {
     const id = select.value;
     if (!id) {
-      if (msg) msg.textContent = "Selecione um operador.";
+      if (msg) msg.textContent = "❌ Selecione um operador.";
       return;
     }
     const nome = select.selectedOptions[0].textContent.split(" (")[0];
     setUsuario(id, nome);
+    initSidebarUsuario();
 
     const destino = window.location.pathname.includes("/pages/")
       ? "../index.html"
@@ -104,7 +112,7 @@ function initLoginPage() {
     btnSair.onclick = () => {
       clearUsuario();
       initSidebarUsuario();
-      if (msg) msg.textContent = "Operador desconectado.";
+      if (msg) msg.textContent = "✅ Operador desconectado.";
       select.value = "";
     };
   }
@@ -122,17 +130,20 @@ function initUsuariosPage() {
     e.preventDefault();
     if (msg) msg.textContent = "Salvando…";
 
-    try {
-      await criarUsuario({
-        nome:  document.getElementById("nuNome").value.trim(),
-        email: document.getElementById("nuEmail").value.trim(),
-        senha: document.getElementById("nuSenha").value,
-        tipo:  document.getElementById("nuTipo").value
-      });
+    const nome  = document.getElementById("nuNome").value.trim();
+    const email = document.getElementById("nuEmail").value.trim();
+    const senha = document.getElementById("nuSenha").value;
+    const tipo  = document.getElementById("nuTipo").value;
 
+    if (!nome || !email || !senha || !tipo) {
+      if (msg) msg.textContent = "❌ Preencha todos os campos.";
+      return;
+    }
+
+    try {
+      await criarUsuario({ nome, email, senha, tipo });
       if (msg) msg.textContent = "✅ Usuário cadastrado com sucesso!";
       form.reset();
-
     } catch (err) {
       if (msg) msg.textContent = "❌ " + err.message;
     }
@@ -142,6 +153,7 @@ function initUsuariosPage() {
 /* ================= DASHBOARD ================= */
 
 async function initDashboard() {
+  // CORREÇÃO: verifica se está na página de dashboard pelo elemento exclusivo dela
   if (!document.getElementById("dashCaixaStatus")) return;
 
   try {
@@ -200,9 +212,12 @@ async function initDashboard() {
     };
   }
 
-  // Botão abrir caixa no dashboard
+  // CORREÇÃO: btnAbrirCaixa no dashboard só é configurado aqui (initDashboard).
+  // initCaixaPage retorna cedo pois btnFechar não existe no dashboard,
+  // mas btnAbrir existe — por isso usamos um atributo data para evitar duplo bind.
   const btnAbrir = document.getElementById("btnAbrirCaixa");
-  if (btnAbrir) {
+  if (btnAbrir && !btnAbrir.dataset.bound) {
+    btnAbrir.dataset.bound = "dashboard";
     btnAbrir.onclick = async () => {
       const data  = document.getElementById("dataCaixa")?.value;
       const valor = document.getElementById("valorInicial")?.value;
@@ -214,7 +229,7 @@ async function initDashboard() {
       try {
         await abrirCaixa(data, valor);
         if (msg) msg.textContent = "✅ Caixa aberto!";
-        initDashboard();
+        await initDashboard();
       } catch (e) {
         if (msg) msg.textContent = "❌ " + e.message;
       }
@@ -228,7 +243,9 @@ function initCaixaPage(hoje) {
   const btnAbrir  = document.getElementById("btnAbrirCaixa");
   const btnFechar = document.getElementById("btnFecharCaixa");
 
-  if (!btnAbrir && !btnFechar) return;
+  // CORREÇÃO: se não houver btnFechar, não é a página de caixa — sai sem configurar handlers
+  // (evita conflito com o handler do dashboard)
+  if (!btnFechar) return;
 
   const inputData = document.getElementById("dataCaixa");
   if (inputData && !inputData.value) inputData.value = hoje;
@@ -282,30 +299,28 @@ function initCaixaPage(hoje) {
     };
   }
 
-  if (btnFechar) {
-    btnFechar.onclick = async () => {
-      const valorFinal = document.getElementById("valorFinalCaixa")?.value;
-      const msg        = document.getElementById("mensagemFechar");
+  btnFechar.onclick = async () => {
+    const valorFinal = document.getElementById("valorFinalCaixa")?.value;
+    const msg        = document.getElementById("mensagemFechar");
 
-      if (valorFinal === "" || valorFinal === null || valorFinal === undefined) {
-        if (msg) msg.textContent = "❌ Informe o valor final contado.";
+    if (valorFinal === "" || valorFinal === null || valorFinal === undefined) {
+      if (msg) msg.textContent = "❌ Informe o valor final contado.";
+      return;
+    }
+
+    try {
+      const caixa = await buscarCaixaAberto();
+      if (!caixa) {
+        if (msg) msg.textContent = "❌ Nenhum caixa aberto.";
         return;
       }
-
-      try {
-        const caixa = await buscarCaixaAberto();
-        if (!caixa) {
-          if (msg) msg.textContent = "❌ Nenhum caixa aberto.";
-          return;
-        }
-        await fecharCaixa(caixa.id, valorFinal);
-        if (msg) msg.textContent = "✅ Caixa fechado com sucesso!";
-        carregarStatusCaixa();
-      } catch (e) {
-        if (msg) msg.textContent = "❌ " + e.message;
-      }
-    };
-  }
+      await fecharCaixa(caixa.id, valorFinal);
+      if (msg) msg.textContent = "✅ Caixa fechado com sucesso!";
+      carregarStatusCaixa();
+    } catch (e) {
+      if (msg) msg.textContent = "❌ " + e.message;
+    }
+  };
 }
 
 /* ================= PRODUTOS ================= */
@@ -642,7 +657,6 @@ function initRelatoriosPage() {
         relatorioConsignado().catch(() => [])
       ]);
 
-      // Cards de topo — campos corretos da view relatorio_vendas_dia
       let total = 0, qtd = 0;
       dias.forEach(d => {
         total += Number(d.total_vendido || 0);
@@ -651,12 +665,10 @@ function initRelatoriosPage() {
       setText("relTotalVendido", formatMoney(total));
       setText("relQtdVendas",    qtd);
 
-      // Produto mais vendido — campo correto: total_vendido (quantidade)
       const topProd = [...produtos].sort((a, b) => Number(b.total_vendido) - Number(a.total_vendido))[0];
       setText("relTopProduto",     topProd?.nome || "—");
       setText("relTopProdutoInfo", topProd ? `${topProd.total_vendido} un. vendidas` : "—");
 
-      // Forma de pagamento mais usada — soma totais por forma nos caixas
       const formaTotais = {};
       caixas.forEach(c => {
         const formas = {
@@ -672,13 +684,11 @@ function initRelatoriosPage() {
       setText("relTopForma",     topFormaEntry ? topFormaEntry[0] : "—");
       setText("relTopFormaInfo", topFormaEntry ? formatMoney(topFormaEntry[1]) : "—");
 
-      // Resumo por forma de pagamento
       const resumoEl = document.getElementById("resumoPagamentos");
       if (resumoEl) {
         if (!caixas.length) {
           resumoEl.innerHTML = "<p>Nenhum dado.</p>";
         } else {
-          // Agrega totais dos campos da view relatorio_caixa
           let totDinheiro = 0, totPix = 0, totCartao = 0, totVendas = 0, totGeral = 0;
           caixas.forEach(c => {
             totDinheiro += Number(c.total_dinheiro || 0);
@@ -718,7 +728,6 @@ function initRelatoriosPage() {
         }
       }
 
-      // Produtos em destaque — campos: nome, total_vendido (qtd), faturamento
       const prodEl = document.getElementById("relatorioProdutos");
       if (prodEl) {
         if (!produtos.length) {
@@ -747,7 +756,6 @@ function initRelatoriosPage() {
         }
       }
 
-      // Consignado — campos: artesao, produto, vendido, faturamento
       const consEl = document.getElementById("relatorioConsignado");
       if (consEl) {
         if (!consignado.length) {
