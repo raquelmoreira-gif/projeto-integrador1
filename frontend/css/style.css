@@ -62,28 +62,26 @@ body {
   padding: 0 8px;
 }
 
-.logo-img {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-  display: block;
-}
-
+/* ===== LOGO ICON — REDONDO ===== */
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   background: var(--accent);
-  border-radius: 10px;
+  border-radius: 50%;          
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 14px;
   color: #fff;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(59,91,219,0.35);
+}
+
+.logo-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .logo-text {
@@ -106,21 +104,6 @@ body {
   font-weight: 600;
   display: block;
   font-size: 13px;
-}
-
-.link-sair {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 4px;
-  font-size: 12px;
-  color: #6b7a99 !important;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.link-sair:hover {
-  color: #93c5fd !important;
 }
 
 .nav-label {
@@ -273,19 +256,6 @@ body {
   color: var(--text-muted);
 }
 
-.card-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.badge-closed { background: #fee2e2; color: #dc2626; }
-.badge-open { background: #dcfce7; color: #16a34a; }
-
 /* ===== PANEL ===== */
 .panel {
   background: var(--surface);
@@ -293,10 +263,6 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
-}
-
-.panel + .panel {
-  /* gap handled by flex parent */
 }
 
 .panel h2 {
@@ -403,15 +369,7 @@ body {
   margin-top: 0 !important;
 }
 
-.btn-inline--sec {
-  background: #6b7280 !important;
-}
-
-.btn-inline--sec:hover {
-  background: #4b5563 !important;
-}
-
-/* ===== SIDE PANEL (produtos prévia) ===== */
+/* ===== SIDE PANEL ===== */
 .side-panel {
   background: var(--surface);
   border-radius: var(--radius);
@@ -432,13 +390,6 @@ body {
   color: var(--text);
   width: 100%;
   text-align: left;
-}
-
-.side-panel-illustration {
-  width: 120px;
-  height: 120px;
-  opacity: 0.85;
-  margin: 8px 0;
 }
 
 .side-panel p {
@@ -516,28 +467,11 @@ body {
   letter-spacing: 0.04em;
 }
 
-.data-table tr:last-child td {
-  border-bottom: none;
-}
-
-.data-table tr:hover td {
-  background: #fafbff;
-}
-
 /* ===== LISTS ===== */
 .produto-linha, .rel-linha {
   padding: 13px 0;
   border-bottom: 1px solid var(--border);
   font-size: 14px;
-}
-
-.rel-linha:last-child { border-bottom: none; }
-
-.produto-acoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
 }
 
 .venda-item {
@@ -549,29 +483,11 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.btn-remover {
-  flex-shrink: 0;
-  background: #f3f4f6 !important;
-  color: #374151 !important;
-  margin-top: 0 !important;
-}
-
-.btn-remover:hover {
-  background: #e5e7eb !important;
-  box-shadow: none !important;
-}
-
 /* ===== PANEL CONSIGNADO ===== */
 .panel-consignado {
   margin-top: 14px;
   padding-top: 16px;
   border-top: 1.5px dashed var(--border);
-}
-
-/* ===== REDIRECT ===== */
-.redirect-msg {
-  padding: 24px;
-  font-size: 16px;
 }
 
 /* ===== RESPONSIVE ===== */
