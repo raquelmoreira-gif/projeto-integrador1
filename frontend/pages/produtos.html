@@ -11,7 +11,11 @@
   <div class="layout">
     <aside class="sidebar">
       <div class="logo">
-        <div class="logo-icon">BC</div>
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>
+        </div>
         <span class="logo-text">Bia Criativa</span>
       </div>
       <p class="sidebar-user">Operador: <span id="usuarioLogado">—</span></p>
@@ -61,7 +65,7 @@
               </div>
             </div>
             <div id="npConsignadoExtras" class="panel-consignado" style="display: none;">
-              <p class="text-muted">Consignado: informe o UUID do artesão e o repasse conforme o modelo do README.</p>
+              <p class="text-muted">Consignado: informe o UUID do artesão e o repasse.</p>
               <input type="text" id="npArtesaoId" placeholder="UUID do artesão (opcional)" autocomplete="off">
               <select id="npTipoRepasse">
                 <option value="">Sem repasse neste cadastro</option>
@@ -71,7 +75,10 @@
               <input type="number" id="npPorcentagemRepasse" placeholder="Porcentagem (%)" min="0" step="0.01">
               <input type="number" id="npValorCusto" placeholder="Valor custo (repasse fixo)" min="0" step="0.01">
             </div>
-            <button type="submit">Cadastrar Produto</button>
+            <button type="submit">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Cadastrar Produto
+            </button>
           </form>
           <p id="mensagemProduto"></p>
         </section>
@@ -121,12 +128,12 @@
 
         <section class="panel" id="panelMovimentar">
           <h2>Movimentar estoque</h2>
-          <p class="text-muted">Movimentações registradas em <code>movimentacoes_estoque</code> com atualização automática do saldo em <code>produtos.quantidade_estoque</code>.</p>
+          <p class="text-muted">Registra entradas e saídas com atualização automática do saldo.</p>
           <div class="panel-row">
             <div class="form-group">
               <label>Produto</label>
               <select id="movProdutoSelect">
-                <option value="">Carregue a lista antes</option>
+                <option value="">Selecione o produto</option>
               </select>
             </div>
             <div class="form-group">
