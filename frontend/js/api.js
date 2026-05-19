@@ -141,6 +141,11 @@ async function criarUsuario(body) {
 }
 
 async function excluirUsuario(usuarioId) {
+  // Desassocia vendas vinculadas antes de excluir (evita fk_usuario_venda)
+  await sbRequest(`vendas?usuario_id=eq.${usuarioId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ usuario_id: null })
+  });
   return sbDelete(`usuarios?id=eq.${usuarioId}`);
 }
 
