@@ -52,51 +52,74 @@ function initSidebarUsuario() {
 /* ================= LOGIN ================= */
 
 function initLoginPage() {
-  const select = document.getElementById("selectUsuarioLogin");
-  const btn    = document.getElementById("btnEntrarLogin");
-  const msg    = document.getElementById("mensagemLogin");
-  if (!select || !btn) return;
+  const btn  = document.getElementById("btnEntrarLogin");
+  const msg  = document.getElementById("mensagemLogin");
+  if (!btn) return;
 
-  carregarUsuarios();
-
-  async function carregarUsuarios() {
-    try {
-      const users = await listarUsuarios();
-      select.innerHTML = '<option value="">Selecione o operador</option>';
-      if (!users || users.length === 0) {
-        select.innerHTML = '<option value="">Nenhum usuário cadastrado</option>';
-        if (msg) msg.textContent = "⚠️ Cadastre um usuário primeiro em Usuários.";
-        return;
-      }
-      users.forEach(u => {
-        const opt = document.createElement("option");
-        opt.value = u.id;
-        opt.textContent = `${u.nome} (${u.tipo})`;
-        select.appendChild(opt);
-      });
-      const idAtual = getUsuarioId();
-      if (idAtual) select.value = idAtual;
-    } catch (e) {
-      if (msg) msg.textContent = "❌ Erro ao carregar usuários: " + e.message;
-    }
+  // Se já houver operador logado, mostra o nome e opção de sair
+  const nomeAtual = getUsuarioNome();
+  if (nomeAtual) {
+    const infoEl = document.getElementById("operadorAtualInfo");
+    if (infoEl) infoEl.textContent = nomeAtual;
+    const painelLogado = document.getElementById("painelOperadorLogado");
+    const painelForm   = document.getElementById("painelFormLogin");
+    if (painelLogado) painelLogado.style.display = "block";
+    if (painelForm)   painelForm.style.display   = "none";
   }
 
-  btn.onclick = () => {
-    const id = select.value;
-    if (!id) { if (msg) msg.textContent = "❌ Selecione um operador."; return; }
-    const nome = select.selectedOptions[0].textContent.split(" (")[0];
-    setUsuario(id, nome);
-    initSidebarUsuario();
-    window.location.href = window.location.pathname.includes("/pages/") ? "../index.html" : "index.html";
+  btn.onclick = async () => {
+    const email = (document.getElementById("inputEmailLogin")?.value || "").trim();
+    const senha =  document.getElementById("inputSenhaLogin")?.value || "";
+    if (!email) { if (msg) msg.textContent = "❌ Informe o e-mail."; return; }
+    if (!senha) { if (msg) msg.textContent = "❌ Informe a senha.";  return; }
+    if (msg) msg.textContent = "Verificando…";
+    btn.disabled = true;
+    try {
+      const usuario = await autenticarUsuario(email, senha);
+      setUsuario(usuario.id, usuario.nome);
+      initSidebarUsuario();
+      if (msg) msg.textContent = `✅ Bem-vindo, ${usuario.nome}! Redirecionando…`;
+      setTimeout(() => {
+        window.location.href = window.location.pathname.includes("/pages/") ? "../index.html" : "index.html";
+      }, 800);
+    } catch (e) {
+      if (msg) msg.textContent = "❌ " + e.message;
+      btn.disabled = false;
+    }
   };
+
+  // Permitir Enter nos campos
+  ["inputEmailLogin", "inputSenhaLogin"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("keydown", e => { if (e.key === "Enter") btn.click(); });
+  });
 
   const btnSair = document.getElementById("btnSairLogin");
   if (btnSair) {
     btnSair.onclick = () => {
       clearUsuario();
       initSidebarUsuario();
+      const painelLogado = document.getElementById("painelOperadorLogado");
+      const painelForm   = document.getElementById("painelFormLogin");
+      if (painelLogado) painelLogado.style.display = "none";
+      if (painelForm)   painelForm.style.display   = "block";
       if (msg) msg.textContent = "✅ Operador desconectado.";
-      select.value = "";
+      document.getElementById("inputEmailLogin").value = "";
+      document.getElementById("inputSenhaLogin").value = "";
+    };
+  }
+
+  // Botão trocar operador (painel logado)
+  const btnTrocar = document.getElementById("btnTrocarOperador");
+  if (btnTrocar) {
+    btnTrocar.onclick = () => {
+      clearUsuario();
+      initSidebarUsuario();
+      const painelLogado = document.getElementById("painelOperadorLogado");
+      const painelForm   = document.getElementById("painelFormLogin");
+      if (painelLogado) painelLogado.style.display = "none";
+      if (painelForm)   painelForm.style.display   = "block";
+      if (msg) msg.textContent = "";
     };
   }
 }
