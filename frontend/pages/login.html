@@ -33,21 +33,46 @@
 
       <main class="main-content">
         <section class="panel panel-login" style="max-width:480px">
-          <h2>Selecionar operador</h2>
-          <p class="text-muted">Necessário para registrar vendas. Cadastre novos usuários em <a href="usuarios.html" style="color:var(--accent);font-weight:600;text-decoration:none">Usuários</a>.</p>
-          <div class="form-group" style="margin-bottom:14px">
-            <label>Operador</label>
-            <select id="selectUsuarioLogin">
-              <option value="">Carregando usuários…</option>
-            </select>
+          <h2>Identificação do operador</h2>
+          <p class="text-muted">Informe seu e-mail e senha para acessar o sistema. Cadastre novos operadores em <a href="usuarios.html" style="color:var(--accent);font-weight:600;text-decoration:none">Usuários</a>.</p>
+
+          <!-- Painel: já está logado -->
+          <div id="painelOperadorLogado" style="display:none">
+            <div style="background:var(--accent-light);border:1.5px solid var(--accent);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <div>
+                <div style="font-size:12px;color:var(--text-muted)">Operador identificado</div>
+                <div style="font-weight:700;color:var(--text)" id="operadorAtualInfo">—</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <a href="../index.html" style="display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Ir ao Dashboard
+              </a>
+              <button type="button" id="btnTrocarOperador" class="btn-ghost">Trocar operador</button>
+            </div>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button type="button" id="btnEntrarLogin">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-              Entrar
-            </button>
-            <button type="button" id="btnSairLogin" class="btn-ghost">Sair / Trocar operador</button>
+
+          <!-- Painel: formulário de login -->
+          <div id="painelFormLogin">
+            <div class="form-group" style="margin-bottom:14px">
+              <label>E-mail</label>
+              <input type="email" id="inputEmailLogin" placeholder="seu@email.com" autocomplete="email">
+            </div>
+            <div class="form-group" style="margin-bottom:18px;position:relative">
+              <label>Senha</label>
+              <input type="password" id="inputSenhaLogin" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button type="button" id="btnEntrarLogin">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                Entrar
+              </button>
+              <button type="button" id="btnSairLogin" class="btn-ghost">Sair / Desconectar</button>
+            </div>
           </div>
+
           <p id="mensagemLogin"></p>
         </section>
       </main>
