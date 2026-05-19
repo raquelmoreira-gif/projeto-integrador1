@@ -830,23 +830,56 @@ function initEstoquePage() {
         relatorioEstoque().catch(() => []),
         relatorioEstoqueBaixo().catch(() => [])
       ]);
+
       if (tabela) {
-        if (!estoque.length) { tabela.innerHTML = "<p>Nenhum produto no estoque.</p>"; }
-        else {
+        if (!estoque.length) {
+          tabela.innerHTML = "<p>Nenhum produto no estoque.</p>";
+        } else {
           tabela.innerHTML = `
             <table style="width:100%;border-collapse:collapse;font-size:14px">
-              <thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:8px 4px">Produto</th><th style="text-align:right;padding:8px 4px">Qtd</th></tr></thead>
-              <tbody>${estoque.map(p => `<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 4px">${p.nome || "—"}</td><td style="padding:8px 4px;text-align:right;${p.quantidade_estoque <= 2 ? 'color:red;font-weight:700' : ''}">${p.quantidade_estoque}</td></tr>`).join("")}</tbody>
+              <thead>
+                <tr style="border-bottom:2px solid var(--border)">
+                  <th style="text-align:left;padding:8px 4px">Produto</th>
+                  <th style="text-align:right;padding:8px 4px">Qtd</th>
+                  <th style="text-align:right;padding:8px 4px">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${estoque.map(p => `
+                  <tr style="border-bottom:1px solid var(--border)">
+                    <td style="padding:8px 4px">${p.nome || "—"}</td>
+                    <td style="padding:8px 4px;text-align:right;${p.quantidade_estoque <= 2 ? 'color:red;font-weight:700' : ''}">
+                      ${p.quantidade_estoque}
+                    </td>
+                    <td style="padding:8px 4px;text-align:right">
+                      <button type="button"
+                        onclick="excluirProdutoEstoque('${p.id}', '${(p.nome || "").replace(/'/g, "\\'")}')"
+                        style="background:var(--danger);color:#fff;border:none;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px;font-weight:600">
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
             </table>`;
         }
       }
+
       if (baixo) {
-        if (!estoqueBaixo.length) { baixo.innerHTML = "<p style='color:green'>✅ Nenhum produto com estoque baixo.</p>"; }
-        else {
+        if (!estoqueBaixo.length) {
+          baixo.innerHTML = "<p style='color:green'>✅ Nenhum produto com estoque baixo.</p>";
+        } else {
           baixo.innerHTML = estoqueBaixo.map(p => `
-            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
               <strong>${p.nome || "—"}</strong>
-              <span style="color:red;font-weight:bold">Qtd: ${p.quantidade_estoque}</span>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="color:red;font-weight:bold">Qtd: ${p.quantidade_estoque}</span>
+                <button type="button"
+                  onclick="excluirProdutoEstoque('${p.id}', '${(p.nome || "").replace(/'/g, "\\'")}')"
+                  style="background:var(--danger);color:#fff;border:none;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px;font-weight:600">
+                  Excluir
+                </button>
+              </div>
             </div>
           `).join("");
         }
@@ -855,6 +888,16 @@ function initEstoquePage() {
       if (tabela) tabela.innerHTML = `<p style="color:red">Erro: ${e.message}</p>`;
     }
   }
+
+  window.excluirProdutoEstoque = async (id, nome) => {
+    if (!confirmar(`Excluir o produto "${nome}" do sistema?\n\nEsta ação remove o produto permanentemente e não pode ser desfeita.`)) return;
+    try {
+      await excluirProduto(id);
+      carregar();
+    } catch (e) {
+      alert("❌ Erro ao excluir produto: " + e.message);
+    }
+  };
 
   carregar();
 }
