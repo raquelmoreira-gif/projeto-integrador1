@@ -104,9 +104,9 @@ function initLoginPage() {
 /* ================= USUARIOS ================= */
 
 function initUsuariosPage() {
-  const form        = document.getElementById("formNovoUsuario");
-  const msg         = document.getElementById("mensagemUsuario");
-  const listaEl     = document.getElementById("listaUsuarios");
+  const form    = document.getElementById("formNovoUsuario");
+  const msg     = document.getElementById("mensagemUsuario");
+  const listaEl = document.getElementById("listaUsuarios");
 
   if (!form && !listaEl) return;
 
@@ -141,7 +141,6 @@ function initUsuariosPage() {
     if (!confirmar(`Excluir o usuário "${nome}"? Esta ação não pode ser desfeita.`)) return;
     try {
       await excluirUsuario(id);
-      // Se era o operador logado, desloga
       if (getUsuarioId() === id) { clearUsuario(); initSidebarUsuario(); }
       carregarUsuarios();
     } catch (e) {
@@ -177,6 +176,22 @@ function initUsuariosPage() {
 
 /* ================= DASHBOARD ================= */
 
+async function carregarProdutosDashboard() {
+  const lista = document.getElementById("listaProdutos");
+  if (!lista) return;
+  lista.innerHTML = "Carregando…";
+  try {
+    const produtos = await listarProdutos();
+    if (!produtos.length) { lista.innerHTML = "<p>Nenhum produto cadastrado.</p>"; return; }
+    lista.innerHTML = produtos.map(p =>
+      `<div class="produto-linha"><strong>${p.nome}</strong> — ${formatMoney(p.preco)}
+       <span style="color:var(--text-muted);font-size:12px"> | Estoque: ${p.quantidade_estoque}</span></div>`
+    ).join("");
+  } catch (e) {
+    lista.innerHTML = `<p style="color:red">${e.message}</p>`;
+  }
+}
+
 async function initDashboard() {
   if (!document.getElementById("dashCaixaStatus")) return;
 
@@ -207,23 +222,13 @@ async function initDashboard() {
     setText("dashCaixaInfo", e.message);
   }
 
+  // Carrega produtos automaticamente ao abrir o dashboard
+  await carregarProdutosDashboard();
+
+  // Botão recarregar mantido para atualizar manualmente
   const btnProd = document.getElementById("btnCarregarProdutos");
   if (btnProd) {
-    btnProd.onclick = async () => {
-      const lista = document.getElementById("listaProdutos");
-      if (!lista) return;
-      lista.innerHTML = "Carregando…";
-      try {
-        const produtos = await listarProdutos();
-        if (!produtos.length) { lista.innerHTML = "<p>Nenhum produto cadastrado.</p>"; return; }
-        lista.innerHTML = produtos.map(p =>
-          `<div class="produto-linha"><strong>${p.nome}</strong> — ${formatMoney(p.preco)}
-           <span style="color:var(--text-muted);font-size:12px"> | Estoque: ${p.quantidade_estoque}</span></div>`
-        ).join("");
-      } catch (e) {
-        lista.innerHTML = `<p style="color:red">${e.message}</p>`;
-      }
-    };
+    btnProd.onclick = carregarProdutosDashboard;
   }
 
   const btnAbrir = document.getElementById("btnAbrirCaixa");
