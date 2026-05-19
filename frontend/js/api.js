@@ -47,6 +47,24 @@ async function atualizarProduto(produtoId, body) {
 }
 
 async function excluirProduto(produtoId) {
+  // 1. Busca os itens de venda que referenciam este produto
+  const itens = await sbRequest(`vendas_itens?produto_id=eq.${produtoId}&select=id,venda_id`);
+
+  if (itens.length > 0) {
+    // 2. Exclui todos os itens vinculados ao produto
+    await sbDelete(`vendas_itens?produto_id=eq.${produtoId}`);
+
+    // 3. Para cada venda afetada, verifica se ficou sem itens e exclui se necessário
+    const vendaIds = [...new Set(itens.map(i => i.venda_id))];
+    for (const vendaId of vendaIds) {
+      const itensRestantes = await sbRequest(`vendas_itens?venda_id=eq.${vendaId}&select=id`);
+      if (itensRestantes.length === 0) {
+        await sbDelete(`vendas?id=eq.${vendaId}`);
+      }
+    }
+  }
+
+  // 4. Agora exclui o produto com segurança
   return sbDelete(`produtos?id=eq.${produtoId}`);
 }
 
