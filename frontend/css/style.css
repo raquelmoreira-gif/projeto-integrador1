@@ -39,7 +39,7 @@ body {
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-  width: 240px;
+  width: 220px;
   min-height: 100vh;
   background: var(--sidebar-bg);
   color: #fff;
