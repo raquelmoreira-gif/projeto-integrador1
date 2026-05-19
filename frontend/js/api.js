@@ -127,6 +127,15 @@ async function listarUsuarios() {
   return sbRequest("usuarios?select=id,nome,email,tipo&order=nome.asc");
 }
 
+async function autenticarUsuario(email, senha) {
+  // Busca por email + senha (senha armazenada em texto puro conforme modelo atual)
+  const rows = await sbRequest(
+    `usuarios?select=id,nome,tipo&email=eq.${encodeURIComponent(email)}&senha=eq.${encodeURIComponent(senha)}&limit=1`
+  );
+  if (!rows.length) throw new Error("E-mail ou senha incorretos.");
+  return rows[0];
+}
+
 async function criarUsuario(body) {
   return sbRequest("usuarios", { method: "POST", body: JSON.stringify(body) });
 }
