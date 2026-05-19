@@ -34,7 +34,7 @@
 
       <main class="main-content">
         <p id="avisoLoginVendas" class="aviso-login">
-          Para registrar vendas na API, <a href="login.html">identifique o operador aqui</a>.
+          Para registrar vendas, <a href="login.html">identifique o operador aqui</a>.
         </p>
 
         <section class="cards">
@@ -48,7 +48,6 @@
             <h2 id="qtdItensVenda">0</h2>
             <span class="card-info">Produtos adicionados</span>
           </div>
-
           <div class="card">
             <div class="card-header">
               <p class="card-title">Total da Venda</p>
@@ -104,6 +103,14 @@
           </button>
           <p id="mensagemVenda"></p>
         </section>
+
+        <!-- HISTÓRICO DE VENDAS -->
+        <section class="panel">
+          <h2>Histórico de Vendas</h2>
+          <p class="text-muted">Clique em Excluir para remover vendas de teste. Esta ação não pode ser desfeita.</p>
+          <div id="listaVendas">Carregando…</div>
+        </section>
+
       </main>
     </div>
   </div>
