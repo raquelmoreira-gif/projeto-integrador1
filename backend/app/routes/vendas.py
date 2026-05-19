@@ -157,39 +157,75 @@ def listar_vendas():
 def excluir_venda(venda_id: str):
     sb = get_supabase()
 
-    # 1. Busca os itens para saber quais produtos terão estoque devolvido
+    # 1. Busca os itens da venda com quantidade de cada produto
     itens_result = (
         sb.table("vendas_itens")
         .select("produto_id, quantidade")
         .eq("venda_id", venda_id)
         .execute()
     )
-
     itens = itens_result.data or []
 
-    try:
-        # 2. Deleta os itens um a um para garantir que o trigger
-        #    trigger_devolver_estoque dispare para cada linha
-        for item in itens:
-            sb.table("vendas_itens").delete().eq("venda_id", venda_id).eq(
-                "produto_id", item["produto_id"]
-            ).execute()
-
-        # 3. Deleta a venda
-        venda_result = (
-            sb.table("vendas")
-            .delete()
-            .eq("id", venda_id)
-            .execute()
-        )
-
+    if not itens:
+        # Tenta excluir a venda mesmo sem itens (pode já ter sido limpa)
+        venda_result = sb.table("vendas").delete().eq("id", venda_id).execute()
         if not venda_result.data:
             return fail("Venda não encontrada", 404)
+        return ok({"mensagem": "Venda excluída (sem itens para devolver)", "itens_devolvidos": 0})
 
-        return ok({
+    try:
+        erros = []
+
+        for item in itens:
+            produto_id = item["produto_id"]
+            quantidade = item["quantidade"]
+
+            # 2. Busca estoque atual do produto
+            produto_result = (
+                sb.table("produtos")
+                .select("id, quantidade_estoque")
+                .eq("id", produto_id)
+                .limit(1)
+                .execute()
+            )
+
+            if not produto_result.data:
+                erros.append(f"Produto {produto_id} não encontrado")
+                continue
+
+            estoque_atual = produto_result.data[0]["quantidade_estoque"]
+            novo_estoque = estoque_atual + quantidade
+
+            # 3. Devolve o estoque manualmente (não depende do trigger)
+            sb.table("produtos").update(
+                {"quantidade_estoque": novo_estoque}
+            ).eq("id", produto_id).execute()
+
+            # 4. Registra a movimentação de entrada no histórico
+            sb.table("movimentacoes_estoque").insert({
+                "produto_id": produto_id,
+                "tipo": "entrada",
+                "quantidade": quantidade,
+                "motivo": f"Devolução por exclusão da venda {venda_id}"
+            }).execute()
+
+        # 5. Deleta todos os itens da venda
+        sb.table("vendas_itens").delete().eq("venda_id", venda_id).execute()
+
+        # 6. Deleta a venda
+        venda_result = sb.table("vendas").delete().eq("id", venda_id).execute()
+
+        if not venda_result.data:
+            return fail("Venda não encontrada ou já excluída", 404)
+
+        resposta = {
             "mensagem": "Venda excluída e estoque devolvido com sucesso",
             "itens_devolvidos": len(itens)
-        })
+        }
+        if erros:
+            resposta["avisos"] = erros
+
+        return ok(resposta)
 
     except Exception as e:
         return fail(f"Erro ao excluir venda: {str(e)}", 500)
