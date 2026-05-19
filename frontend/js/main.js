@@ -52,51 +52,91 @@ function initSidebarUsuario() {
 /* ================= LOGIN ================= */
 
 function initLoginPage() {
-  const select = document.getElementById("selectUsuarioLogin");
-  const btn    = document.getElementById("btnEntrarLogin");
-  const msg    = document.getElementById("mensagemLogin");
-  if (!select || !btn) return;
+  const painelLogado  = document.getElementById("painelOperadorLogado");
+  const painelForm    = document.getElementById("painelFormLogin");
+  const btnEntrar     = document.getElementById("btnEntrarLogin");
+  const btnSair       = document.getElementById("btnSairLogin");
+  const btnTrocar     = document.getElementById("btnTrocarOperador");
+  const inputEmail    = document.getElementById("inputEmailLogin");
+  const inputSenha    = document.getElementById("inputSenhaLogin");
+  const msg           = document.getElementById("mensagemLogin");
+  const operadorInfo  = document.getElementById("operadorAtualInfo");
 
-  carregarUsuarios();
+  // Só roda na página de login
+  if (!btnEntrar && !painelLogado) return;
 
-  async function carregarUsuarios() {
-    try {
-      const users = await listarUsuarios();
-      select.innerHTML = '<option value="">Selecione o operador</option>';
-      if (!users || users.length === 0) {
-        select.innerHTML = '<option value="">Nenhum usuário cadastrado</option>';
-        if (msg) msg.textContent = "⚠️ Cadastre um usuário primeiro em Usuários.";
-        return;
-      }
-      users.forEach(u => {
-        const opt = document.createElement("option");
-        opt.value = u.id;
-        opt.textContent = `${u.nome} (${u.tipo})`;
-        select.appendChild(opt);
-      });
-      const idAtual = getUsuarioId();
-      if (idAtual) select.value = idAtual;
-    } catch (e) {
-      if (msg) msg.textContent = "❌ Erro ao carregar usuários: " + e.message;
+  function atualizarPaineis() {
+    const nome = getUsuarioNome();
+    const id   = getUsuarioId();
+    if (nome && id) {
+      if (painelLogado) painelLogado.style.display = "block";
+      if (painelForm)   painelForm.style.display   = "none";
+      if (operadorInfo) operadorInfo.textContent    = nome;
+    } else {
+      if (painelLogado) painelLogado.style.display = "none";
+      if (painelForm)   painelForm.style.display   = "block";
     }
   }
 
-  btn.onclick = () => {
-    const id = select.value;
-    if (!id) { if (msg) msg.textContent = "❌ Selecione um operador."; return; }
-    const nome = select.selectedOptions[0].textContent.split(" (")[0];
-    setUsuario(id, nome);
-    initSidebarUsuario();
-    window.location.href = window.location.pathname.includes("/pages/") ? "../index.html" : "index.html";
-  };
+  atualizarPaineis();
 
-  const btnSair = document.getElementById("btnSairLogin");
+  if (btnEntrar) {
+    btnEntrar.onclick = async () => {
+      const email = inputEmail?.value.trim();
+      const senha = inputSenha?.value;
+      if (!email || !senha) {
+        if (msg) msg.textContent = "❌ Preencha o e-mail e a senha.";
+        return;
+      }
+      if (msg) msg.textContent = "Verificando…";
+      try {
+        const usuario = await autenticarUsuario(email, senha);
+        setUsuario(usuario.id, usuario.nome);
+        initSidebarUsuario();
+        if (msg) msg.textContent = `✅ Bem-vinda, ${usuario.nome}!`;
+        atualizarPaineis();
+        setTimeout(() => {
+          window.location.href = window.location.pathname.includes("/pages/")
+            ? "../index.html"
+            : "index.html";
+        }, 800);
+      } catch (e) {
+        if (msg) msg.textContent = "❌ " + e.message;
+        if (inputSenha) inputSenha.value = "";
+      }
+    };
+  }
+
+  // Permite confirmar com Enter
+  if (inputSenha) {
+    inputSenha.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") btnEntrar?.click();
+    });
+  }
+  if (inputEmail) {
+    inputEmail.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") inputSenha?.focus();
+    });
+  }
+
   if (btnSair) {
     btnSair.onclick = () => {
       clearUsuario();
       initSidebarUsuario();
       if (msg) msg.textContent = "✅ Operador desconectado.";
-      select.value = "";
+      if (inputEmail) inputEmail.value = "";
+      if (inputSenha) inputSenha.value = "";
+      atualizarPaineis();
+    };
+  }
+
+  if (btnTrocar) {
+    btnTrocar.onclick = () => {
+      clearUsuario();
+      initSidebarUsuario();
+      if (inputEmail) inputEmail.value = "";
+      if (inputSenha) inputSenha.value = "";
+      atualizarPaineis();
     };
   }
 }
@@ -222,14 +262,10 @@ async function initDashboard() {
     setText("dashCaixaInfo", e.message);
   }
 
-  // Carrega produtos automaticamente ao abrir o dashboard
   await carregarProdutosDashboard();
 
-  // Botão recarregar mantido para atualizar manualmente
   const btnProd = document.getElementById("btnCarregarProdutos");
-  if (btnProd) {
-    btnProd.onclick = carregarProdutosDashboard;
-  }
+  if (btnProd) btnProd.onclick = carregarProdutosDashboard;
 
   const btnAbrir = document.getElementById("btnAbrirCaixa");
   if (btnAbrir && !btnAbrir.dataset.bound) {
@@ -610,11 +646,11 @@ function initVendasPage() {
   }
 
   // ---- TROCO ----
-  const selectForma     = document.getElementById("formaPagamento");
-  const blocoDinheiro   = document.getElementById("blocoDinheiro");
-  const inputRecebido   = document.getElementById("valorRecebido");
-  const trocoDisplay    = document.getElementById("trocoDisplay");
-  const avisoTroco      = document.getElementById("avisoTroco");
+  const selectForma   = document.getElementById("formaPagamento");
+  const blocoDinheiro = document.getElementById("blocoDinheiro");
+  const inputRecebido = document.getElementById("valorRecebido");
+  const trocoDisplay  = document.getElementById("trocoDisplay");
+  const avisoTroco    = document.getElementById("avisoTroco");
 
   function totalCarrinho() {
     return carrinho.reduce((s, i) => s + i.preco * i.quantidade, 0);
@@ -660,7 +696,6 @@ function initVendasPage() {
     if (!carrinho.length) { if (msg) msg.textContent = "❌ Adicione ao menos um produto.";   return; }
     if (!forma)           { if (msg) msg.textContent = "❌ Selecione a forma de pagamento."; return; }
 
-    // Validação extra para dinheiro
     if (forma === "dinheiro") {
       const recebido = Number(inputRecebido?.value || 0);
       if (!recebido) { if (msg) msg.textContent = "❌ Informe o valor recebido em dinheiro."; return; }
@@ -671,7 +706,6 @@ function initVendasPage() {
     try {
       await criarVenda({ usuario_id: uid, forma_pagamento: forma, itens: carrinho.map(i => ({ produto_id: i.produto_id, quantidade: i.quantidade })) });
 
-      // Exibe troco antes de limpar o carrinho
       if (forma === "dinheiro") {
         const troco = Number(inputRecebido.value) - totalCarrinho();
         if (msg) msg.textContent = `✅ Venda registrada! Troco: ${formatMoney(troco)}`;
