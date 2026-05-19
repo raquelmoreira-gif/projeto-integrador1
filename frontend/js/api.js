@@ -1,5 +1,7 @@
 /* ================================================
    API — Supabase REST direto (sem backend Flask)
+   Exceção: operações que precisam de permissão
+   completa (ex: excluir venda) usam o backend.
    ================================================ */
 
 const SUPABASE_URL = "https://yheyhjcdzljcpoputsvo.supabase.co";
@@ -32,6 +34,18 @@ async function sbDelete(path) {
   return true;
 }
 
+// Chamada para o backend Flask (tem permissão total no Supabase)
+async function backendRequest(path, options = {}) {
+  const url = `${window.API_BASE_URL}${path}`;
+  const res = await fetch(url, {
+    headers: { "Content-Type": "application/json" },
+    ...options
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Erro HTTP ${res.status}`);
+  return data;
+}
+
 /* ================= PRODUTOS ================= */
 
 async function listarProdutos() {
@@ -47,14 +61,11 @@ async function atualizarProduto(produtoId, body) {
 }
 
 async function excluirProduto(produtoId) {
-  // 1. Busca os itens de venda que referenciam este produto
   const itens = await sbRequest(`vendas_itens?produto_id=eq.${produtoId}&select=id,venda_id`);
 
   if (itens.length > 0) {
-    // 2. Exclui todos os itens vinculados ao produto
     await sbDelete(`vendas_itens?produto_id=eq.${produtoId}`);
 
-    // 3. Para cada venda afetada, verifica se ficou sem itens e exclui se necessário
     const vendaIds = [...new Set(itens.map(i => i.venda_id))];
     for (const vendaId of vendaIds) {
       const itensRestantes = await sbRequest(`vendas_itens?venda_id=eq.${vendaId}&select=id`);
@@ -64,7 +75,6 @@ async function excluirProduto(produtoId) {
     }
   }
 
-  // 4. Agora exclui o produto com segurança
   return sbDelete(`produtos?id=eq.${produtoId}`);
 }
 
@@ -128,7 +138,6 @@ async function listarUsuarios() {
 }
 
 async function autenticarUsuario(email, senha) {
-  // Busca por email + senha (senha armazenada em texto puro conforme modelo atual)
   const rows = await sbRequest(
     `usuarios?select=id,nome,tipo&email=eq.${encodeURIComponent(email)}&senha=eq.${encodeURIComponent(senha)}&limit=1`
   );
@@ -141,7 +150,6 @@ async function criarUsuario(body) {
 }
 
 async function excluirUsuario(usuarioId) {
-  // Desassocia vendas vinculadas antes de excluir (evita fk_usuario_venda)
   await sbRequest(`vendas?usuario_id=eq.${usuarioId}`, {
     method: "PATCH",
     body: JSON.stringify({ usuario_id: null })
@@ -156,42 +164,21 @@ async function listarVendas() {
 }
 
 async function criarVenda(payload) {
-  const { usuario_id, forma_pagamento, itens } = payload;
-
-  const caixa = await buscarCaixaAberto();
-  if (!caixa) throw new Error("Não existe caixa aberto para registrar venda.");
-
-  const ids = itens.map(i => i.produto_id);
-  const produtos = await sbRequest(`produtos?id=in.(${ids.join(",")})&select=id,preco`);
-  const map = Object.fromEntries(produtos.map(p => [p.id, Number(p.preco)]));
-
-  let valor_total = 0;
-  for (const item of itens) {
-    if (!map[item.produto_id]) throw new Error(`Produto não encontrado`);
-    valor_total += map[item.produto_id] * item.quantidade;
-  }
-
-  const vendas = await sbRequest("vendas", {
+  // Criação via backend para garantir validações e triggers
+  const result = await backendRequest("/vendas", {
     method: "POST",
-    body: JSON.stringify({ caixa_id: caixa.id, usuario_id, forma_pagamento, status: "paga", valor_total })
+    body: JSON.stringify(payload)
   });
-
-  const venda = vendas[0];
-  const itensPayload = itens.map(item => ({
-    venda_id: venda.id,
-    produto_id: item.produto_id,
-    quantidade: item.quantidade,
-    preco_unitario: map[item.produto_id],
-    subtotal: map[item.produto_id] * item.quantidade
-  }));
-
-  await sbRequest("vendas_itens", { method: "POST", body: JSON.stringify(itensPayload) });
-  return { venda, itens: itensPayload };
+  return result.data;
 }
 
 async function excluirVenda(vendaId) {
-  await sbDelete(`vendas_itens?venda_id=eq.${vendaId}`);
-  return sbDelete(`vendas?id=eq.${vendaId}`);
+  // Exclusão via backend: garante que o trigger de devolução
+  // de estoque rode com permissão total no Supabase
+  const result = await backendRequest(`/vendas/${vendaId}`, {
+    method: "DELETE"
+  });
+  return result.data;
 }
 
 /* ================= RELATORIOS ================= */
