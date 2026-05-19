@@ -139,3 +139,57 @@ def criar_venda():
 
     except Exception as e:
         return fail(f"Erro ao criar venda: {str(e)}", 500)
+
+
+@vendas_bp.get("")
+def listar_vendas():
+    sb = get_supabase()
+    result = (
+        sb.table("vendas")
+        .select("*")
+        .order("criado_em", desc=True)
+        .execute()
+    )
+    return ok(result.data)
+
+
+@vendas_bp.delete("/<venda_id>")
+def excluir_venda(venda_id: str):
+    sb = get_supabase()
+
+    # 1. Busca os itens para saber quais produtos terão estoque devolvido
+    itens_result = (
+        sb.table("vendas_itens")
+        .select("produto_id, quantidade")
+        .eq("venda_id", venda_id)
+        .execute()
+    )
+
+    itens = itens_result.data or []
+
+    try:
+        # 2. Deleta os itens um a um para garantir que o trigger
+        #    trigger_devolver_estoque dispare para cada linha
+        for item in itens:
+            sb.table("vendas_itens").delete().eq("venda_id", venda_id).eq(
+                "produto_id", item["produto_id"]
+            ).execute()
+
+        # 3. Deleta a venda
+        venda_result = (
+            sb.table("vendas")
+            .delete()
+            .eq("id", venda_id)
+            .execute()
+        )
+
+        if not venda_result.data:
+            return fail("Venda não encontrada", 404)
+
+        return ok({
+            "mensagem": "Venda excluída e estoque devolvido com sucesso",
+            "itens_devolvidos": len(itens)
+        })
+
+    except Exception as e:
+        return fail(f"Erro ao excluir venda: {str(e)}", 500)
