@@ -593,7 +593,7 @@ function initVendasPage() {
   }
 
   window.deletarVenda = async (id) => {
-    if (!confirmar("Excluir esta venda? O estoque não será devolvido automaticamente. Esta ação não pode ser desfeita.")) return;
+    if (!confirmar("Excluir esta venda? O estoque dos produtos será devolvido automaticamente. Esta ação não pode ser desfeita.")) return;
     try {
       await excluirVenda(id);
       carregarHistoricoVendas();
