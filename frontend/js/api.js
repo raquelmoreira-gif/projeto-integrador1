@@ -1,7 +1,7 @@
 /* ================================================
    API — Supabase REST direto (sem backend Flask)
    Exceção: operações que precisam de permissão
-   completa (ex: excluir venda, usuarios) usam o backend.
+   completa (ex: excluir venda) usam o backend.
    ================================================ */
 
 const SUPABASE_URL = "https://yheyhjcdzljcpoputsvo.supabase.co";
@@ -14,16 +14,19 @@ const SB_HEADERS = {
   "Prefer": "return=representation"
 };
 
+// usa fetchComRetry (de api-utils.js) se disponível, senão cai no fetch nativo
+const _fetch = typeof fetchComRetry !== "undefined" ? fetchComRetry : fetch;
+
 async function sbRequest(path, options = {}) {
   const url = `${SUPABASE_URL}/rest/v1/${path}`;
-  const res = await fetch(url, { headers: SB_HEADERS, ...options });
+  const res = await _fetch(url, { headers: SB_HEADERS, ...options });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.message || data.error || `Erro HTTP ${res.status}`);
   return data;
 }
 
 async function sbDelete(path) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+  const res = await _fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     method: "DELETE",
     headers: SB_HEADERS
   });
@@ -37,7 +40,7 @@ async function sbDelete(path) {
 // Chamada para o backend Flask (tem permissão total no Supabase)
 async function backendRequest(path, options = {}) {
   const url = `${window.API_BASE_URL}${path}`;
-  const res = await fetch(url, {
+  const res = await _fetch(url, {
     headers: { "Content-Type": "application/json" },
     ...options
   });
@@ -133,38 +136,20 @@ async function fecharCaixa(caixaId, valorFinal) {
 
 /* ================= USUARIOS ================= */
 
-// Lista usuários via backend Flask (evita bloqueio de RLS com chave pública)
 async function listarUsuarios() {
-  const result = await backendRequest("/usuarios");
-  return result.data || [];
+  return sbRequest("usuarios?select=id,nome,email,tipo&order=nome.asc");
 }
 
-// Autentica buscando pelo backend, que tem acesso irrestrito à tabela
 async function autenticarUsuario(email, senha) {
-  const usuarios = await listarUsuarios();
-  const usuario = usuarios.find(
-    u => u.email === email.trim()
+  const rows = await sbRequest(
+    `usuarios?select=id,nome,tipo&email=eq.${encodeURIComponent(email)}&senha=eq.${encodeURIComponent(senha)}&limit=1`
   );
-  if (!usuario) throw new Error("E-mail ou senha incorretos.");
-
-  // Busca com senha via backend — faz query direta no Supabase server-side
-  const result = await backendRequest(
-    `/usuarios/login`,
-    {
-      method: "POST",
-      body: JSON.stringify({ email: email.trim(), senha })
-    }
-  );
-  return result.data;
+  if (!rows.length) throw new Error("E-mail ou senha incorretos.");
+  return rows[0];
 }
 
-// Cria usuário via backend Flask (POST /api/usuarios)
 async function criarUsuario(body) {
-  const result = await backendRequest("/usuarios", {
-    method: "POST",
-    body: JSON.stringify(body)
-  });
-  return result.data;
+  return sbRequest("usuarios", { method: "POST", body: JSON.stringify(body) });
 }
 
 async function excluirUsuario(usuarioId) {
