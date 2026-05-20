@@ -1,7 +1,7 @@
 /* ================================================
    API — Supabase REST direto (sem backend Flask)
    Exceção: operações que precisam de permissão
-   completa (ex: excluir venda) usam o backend.
+   completa (ex: excluir venda, usuarios) usam o backend.
    ================================================ */
 
 const SUPABASE_URL = "https://yheyhjcdzljcpoputsvo.supabase.co";
@@ -133,20 +133,38 @@ async function fecharCaixa(caixaId, valorFinal) {
 
 /* ================= USUARIOS ================= */
 
+// Lista usuários via backend Flask (evita bloqueio de RLS com chave pública)
 async function listarUsuarios() {
-  return sbRequest("usuarios?select=id,nome,email,tipo&order=nome.asc");
+  const result = await backendRequest("/usuarios");
+  return result.data || [];
 }
 
+// Autentica buscando pelo backend, que tem acesso irrestrito à tabela
 async function autenticarUsuario(email, senha) {
-  const rows = await sbRequest(
-    `usuarios?select=id,nome,tipo&email=eq.${encodeURIComponent(email)}&senha=eq.${encodeURIComponent(senha)}&limit=1`
+  const usuarios = await listarUsuarios();
+  const usuario = usuarios.find(
+    u => u.email === email.trim()
   );
-  if (!rows.length) throw new Error("E-mail ou senha incorretos.");
-  return rows[0];
+  if (!usuario) throw new Error("E-mail ou senha incorretos.");
+
+  // Busca com senha via backend — faz query direta no Supabase server-side
+  const result = await backendRequest(
+    `/usuarios/login`,
+    {
+      method: "POST",
+      body: JSON.stringify({ email: email.trim(), senha })
+    }
+  );
+  return result.data;
 }
 
+// Cria usuário via backend Flask (POST /api/usuarios)
 async function criarUsuario(body) {
-  return sbRequest("usuarios", { method: "POST", body: JSON.stringify(body) });
+  const result = await backendRequest("/usuarios", {
+    method: "POST",
+    body: JSON.stringify(body)
+  });
+  return result.data;
 }
 
 async function excluirUsuario(usuarioId) {
