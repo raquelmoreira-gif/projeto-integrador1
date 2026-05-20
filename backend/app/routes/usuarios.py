@@ -27,3 +27,28 @@ def criar_usuario():
     sb = get_supabase()
     result = sb.table("usuarios").insert(body).execute()
     return ok(result.data, 201)
+
+
+@usuarios_bp.post("/login")
+def login_usuario():
+    body = request.get_json(silent=True) or {}
+    email = body.get("email", "").strip()
+    senha = body.get("senha", "")
+
+    if not email or not senha:
+        return fail("E-mail e senha são obrigatórios", 422)
+
+    sb = get_supabase()
+    result = (
+        sb.table("usuarios")
+        .select("id,nome,tipo")
+        .eq("email", email)
+        .eq("senha", senha)
+        .limit(1)
+        .execute()
+    )
+
+    if not result.data:
+        return fail("E-mail ou senha incorretos", 401)
+
+    return ok(result.data[0])
