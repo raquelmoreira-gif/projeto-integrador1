@@ -38,21 +38,21 @@
         <section class="panel" style="max-width:560px">
           <h2>Novo usuário</h2>
           <p class="text-muted">Cadastre novos operadores com nome, e-mail único, senha e tipo (<code>admin</code> ou <code>suporte</code>).</p>
-          <form id="formNovoUsuario">
+          <form id="formNovoUsuario" autocomplete="off">
             <div class="panel-row">
               <div class="form-group">
                 <label>Nome</label>
-                <input type="text" id="nuNome" placeholder="Nome completo" required autocomplete="name">
+                <input type="text" id="nuNome" placeholder="Nome completo" required autocomplete="off">
               </div>
               <div class="form-group">
                 <label>E-mail</label>
-                <input type="email" id="nuEmail" placeholder="email@exemplo.com" required autocomplete="email">
+                <input type="email" id="nuEmail" placeholder="email@exemplo.com" required autocomplete="off">
               </div>
             </div>
             <div class="panel-row">
               <div class="form-group">
                 <label>Senha</label>
-                <input type="password" id="nuSenha" placeholder="Senha segura" required autocomplete="new-password">
+                <input type="password" id="nuSenha" placeholder="Senha segura" required autocomplete="off">
               </div>
               <div class="form-group">
                 <label>Tipo</label>
