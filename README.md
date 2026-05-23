@@ -103,16 +103,27 @@ Funcionalidades implementadas e integradas. Melhorias de segurança e arquitetur
 
 ---
 
-## 🔗 Integração
-
-O sistema depende da comunicação entre frontend, backend e banco de dados.
-
-Nesta fase, podem ocorrer:
-
-* Funcionalidades incompletas
-* Dados não persistidos corretamente
-* Ajustes em rotas e integrações
-
+## 🗄️ Banco de Dados
+ 
+O schema completo está em `database/schema.sql` e pode ser aplicado diretamente no Supabase.
+ 
+**Destaques da modelagem:**
+- Triggers automáticos para controle de estoque (baixa, devolução, atualização)
+- Constraint que impede dois caixas abertos simultaneamente
+- Views prontas para todos os relatórios
+- Validação de estoque antes de confirmar venda
+Consulte `database/README.md` para documentação detalhada.
+ 
+---
+ 
+## 🔒 Segurança
+ 
+- Senhas armazenadas com hash **bcrypt** (nunca em texto puro)
+- Acesso à página de usuários restrito a operadores logados
+- Login e cadastro de usuários processados exclusivamente pelo backend
+- Data de abertura de caixa restrita ao dia atual
+> Melhorias de segurança adicionais estão planejadas para o Projeto Integrador II.
+ 
 ---
 
 
@@ -128,15 +139,13 @@ Projeto desenvolvido por alunas do curso de Engenharia da Computação, Ciência
 * Raquel Moreira Ferreira
 * Tamara da Costa e Silva
 
+
 ---
 
 ## 📄 Observações
 
 Este projeto está em constante evolução e pode sofrer alterações conforme o avanço do desenvolvimento.
 
-
-
 ## 📄 Licença
  
 Este projeto foi desenvolvido para fins acadêmicos. Todos os direitos reservados à equipe e à UNIVESP.
-
