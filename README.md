@@ -31,11 +31,11 @@ A proposta surge a partir da necessidade real de digitalizar o controle manual u
 
 | Camada | Tecnologia |
 |---|---|
-| ## Frontend | HTML5, CSS3, JavaScript (Vanilla) |
-| ## Backend | Python 3.11, Flask |
-| ## Banco de Dados | PostgreSQL via Supabase |
-| ## Hospedagem | Render (backend) | GitHub Pages (frontend)
-| ## Segurança | bcrypt (hash de senhas) |
+| Frontend | HTML5, CSS3, JavaScript (Vanilla) |
+| Backend | Python 3.11, Flask |
+| Banco de Dados | PostgreSQL via Supabase |
+| Hospedagem | Render (backend) | GitHub Pages (frontend)
+| Segurança | bcrypt (hash de senhas) |
 
 
 ---
