@@ -68,6 +68,33 @@ projeto-integrador1/
 
 ---
 
+
+## 📋 Endpoints da API
+ 
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/health` | Verifica se a API está online |
+| GET/POST | `/api/produtos` | Lista e cadastra produtos |
+| PATCH | `/api/produtos/:id` | Atualiza produto |
+| POST | `/api/produtos/:id/movimentar` | Movimenta estoque |
+| GET | `/api/caixa` | Lista caixas |
+| GET | `/api/caixa/aberto` | Retorna caixa aberto |
+| POST | `/api/caixa/abrir` | Abre novo caixa |
+| POST | `/api/caixa/:id/fechar` | Fecha caixa |
+| GET/POST | `/api/usuarios` | Lista e cadastra usuários |
+| POST | `/api/usuarios/login` | Autentica operador |
+| GET/POST | `/api/vendas` | Lista e registra vendas |
+| DELETE | `/api/vendas/:id` | Exclui venda e devolve estoque |
+| GET | `/api/relatorios/caixa` | Relatório de caixa |
+| GET | `/api/relatorios/vendas-produto` | Produtos mais vendidos |
+| GET | `/api/relatorios/vendas-dia` | Vendas por dia |
+| GET | `/api/relatorios/estoque` | Estoque atual |
+| GET | `/api/relatorios/estoque-baixo` | Produtos com estoque crítico |
+| GET | `/api/relatorios/consignado` | Relatório por artesão |
+
+
+---
+
 ## 🚧 Status do Projeto
 
 **Projeto Integrador I — concluído** ✅
