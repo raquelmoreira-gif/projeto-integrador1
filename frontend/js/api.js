@@ -1,7 +1,7 @@
 /* ================================================
    API — Supabase REST direto (sem backend Flask)
    Exceção: operações que precisam de permissão
-   completa (ex: excluir venda) usam o backend.
+   completa ou segurança (login, vendas) usam o backend.
    ================================================ */
 
 const SUPABASE_URL = "https://yheyhjcdzljcpoputsvo.supabase.co";
@@ -14,7 +14,6 @@ const SB_HEADERS = {
   "Prefer": "return=representation"
 };
 
-// usa fetchComRetry (de api-utils.js) se disponível, senão cai no fetch nativo
 const _fetch = typeof fetchComRetry !== "undefined" ? fetchComRetry : fetch;
 
 async function sbRequest(path, options = {}) {
@@ -137,19 +136,27 @@ async function fecharCaixa(caixaId, valorFinal) {
 /* ================= USUARIOS ================= */
 
 async function listarUsuarios() {
+  // Vai pelo Supabase direto — nunca retorna o campo senha (select explícito)
   return sbRequest("usuarios?select=id,nome,email,tipo&order=nome.asc");
 }
 
 async function autenticarUsuario(email, senha) {
-  const rows = await sbRequest(
-    `usuarios?select=id,nome,tipo&email=eq.${encodeURIComponent(email)}&senha=eq.${encodeURIComponent(senha)}&limit=1`
-  );
-  if (!rows.length) throw new Error("E-mail ou senha incorretos.");
-  return rows[0];
+  // SEGURANÇA: login sempre via backend para usar bcrypt no servidor
+  // Nunca comparar senha direto pelo Supabase REST (exporia o hash ou texto puro)
+  const result = await backendRequest("/usuarios/login", {
+    method: "POST",
+    body: JSON.stringify({ email, senha })
+  });
+  return result.data;
 }
 
 async function criarUsuario(body) {
-  return sbRequest("usuarios", { method: "POST", body: JSON.stringify(body) });
+  // Cadastro via backend para garantir que o hash seja aplicado antes de salvar
+  const result = await backendRequest("/usuarios", {
+    method: "POST",
+    body: JSON.stringify(body)
+  });
+  return result.data;
 }
 
 async function excluirUsuario(usuarioId) {
@@ -167,7 +174,6 @@ async function listarVendas() {
 }
 
 async function criarVenda(payload) {
-  // Criação via backend para garantir validações e triggers
   const result = await backendRequest("/vendas", {
     method: "POST",
     body: JSON.stringify(payload)
@@ -176,8 +182,6 @@ async function criarVenda(payload) {
 }
 
 async function excluirVenda(vendaId) {
-  // Exclusão via backend: garante que o trigger de devolução
-  // de estoque rode com permissão total no Supabase
   const result = await backendRequest(`/vendas/${vendaId}`, {
     method: "DELETE"
   });
