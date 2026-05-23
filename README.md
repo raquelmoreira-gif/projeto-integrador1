@@ -129,7 +129,7 @@ Consulte `database/README.md` para documentação detalhada.
 
 ## 👩‍💻 Equipe
 
-Projeto desenvolvido por alunas do curso de Engenharia da Computação, Ciência de Dadose Bacharelado em Tecnologia da Informação — UNIVESP.
+Projeto desenvolvido por alunas do curso de Engenharia da Computação, Ciência de Dados e Bacharelado em Tecnologia da Informação — UNIVESP.
 
 * Camila Nascimento dos Santos
 * Evelyn dos Santos Rofino
