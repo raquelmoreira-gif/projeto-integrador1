@@ -119,6 +119,7 @@ function initLoginPage() {
     });
   }
 
+  // CORREÇÃO: btnSair agora funciona como sair/desconectar
   if (btnSair) {
     btnSair.onclick = () => {
       clearUsuario();
@@ -130,6 +131,7 @@ function initLoginPage() {
     };
   }
 
+  // CORREÇÃO: btnTrocar agora também desconecta e exibe o formulário
   if (btnTrocar) {
     btnTrocar.onclick = () => {
       clearUsuario();
@@ -150,8 +152,23 @@ function initUsuariosPage() {
 
   if (!form && !listaEl) return;
 
+  // CORREÇÃO: só exibe a lista e permite exclusão se houver um admin logado
+  const usuarioLogadoId   = getUsuarioId();
+  const usuarioLogadoNome = getUsuarioNome();
+
   async function carregarUsuarios() {
     if (!listaEl) return;
+
+    // Verifica se há operador logado
+    if (!usuarioLogadoId) {
+      listaEl.innerHTML = `
+        <div style="padding:14px 16px;background:var(--warning-bg);border:1.5px solid #fde68a;border-radius:var(--radius);font-size:13px">
+          ⚠️ Faça login para visualizar os usuários cadastrados.
+          <a href="login.html" style="color:var(--accent);font-weight:600;text-decoration:none;margin-left:6px">Entrar →</a>
+        </div>`;
+      return;
+    }
+
     listaEl.innerHTML = "Carregando…";
     try {
       const users = await listarUsuarios();
@@ -159,25 +176,35 @@ function initUsuariosPage() {
         listaEl.innerHTML = "<p>Nenhum usuário cadastrado.</p>";
         return;
       }
-      listaEl.innerHTML = users.map(u => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <strong>${u.nome}</strong>
-            <span style="margin-left:8px;font-size:12px;color:var(--text-muted)">(${u.tipo})</span><br>
-            <span style="font-size:13px;color:var(--text-muted)">${u.email}</span>
-          </div>
-          <button type="button" onclick="deletarUsuario('${u.id}','${u.nome.replace(/'/g, "\\'")}')"
-            style="background:var(--danger);color:#fff;border:none;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:600">
-            Excluir
-          </button>
-        </div>
-      `).join("");
+      listaEl.innerHTML = users.map(u => {
+        // Só exibe botão Excluir se o operador logado for diferente do usuário listado
+        const ehOMesmo = u.id === usuarioLogadoId;
+        const btnExcluir = ehOMesmo
+          ? `<span style="font-size:12px;color:var(--text-faint)">(você)</span>`
+          : `<button type="button" onclick="deletarUsuario('${u.id}','${u.nome.replace(/'/g, "\\'")}')"
+              style="background:var(--danger);color:#fff;border:none;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:600">
+              Excluir
+            </button>`;
+        return `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div>
+              <strong>${u.nome}</strong>
+              <span style="margin-left:8px;font-size:12px;color:var(--text-muted)">(${u.tipo})</span><br>
+              <span style="font-size:13px;color:var(--text-muted)">${u.email}</span>
+            </div>
+            ${btnExcluir}
+          </div>`;
+      }).join("");
     } catch (e) {
       listaEl.innerHTML = `<p style="color:red">Erro: ${e.message}</p>`;
     }
   }
 
   window.deletarUsuario = async (id, nome) => {
+    if (!usuarioLogadoId) {
+      alert("❌ Faça login antes de excluir usuários.");
+      return;
+    }
     if (!confirmar(`Excluir o usuário "${nome}"? Esta ação não pode ser desfeita.`)) return;
     try {
       await excluirUsuario(id);
@@ -191,6 +218,16 @@ function initUsuariosPage() {
   carregarUsuarios();
 
   if (form) {
+    // Bloqueia cadastro se não estiver logado
+    if (!usuarioLogadoId) {
+      form.innerHTML = `
+        <div style="padding:14px 16px;background:var(--warning-bg);border:1.5px solid #fde68a;border-radius:var(--radius);font-size:13px">
+          ⚠️ Faça login para cadastrar novos usuários.
+          <a href="login.html" style="color:var(--accent);font-weight:600;text-decoration:none;margin-left:6px">Entrar →</a>
+        </div>`;
+      return;
+    }
+
     form.onsubmit = async (e) => {
       e.preventDefault();
       if (msg) msg.textContent = "Salvando…";
@@ -267,6 +304,16 @@ async function initDashboard() {
   const btnProd = document.getElementById("btnCarregarProdutos");
   if (btnProd) btnProd.onclick = carregarProdutosDashboard;
 
+  // CORREÇÃO: trava o input de data no dia atual
+  const inputDataDash = document.getElementById("dataCaixa");
+  if (inputDataDash) {
+    const hoje = new Date().toISOString().split("T")[0];
+    inputDataDash.value = hoje;
+    inputDataDash.min   = hoje;
+    inputDataDash.max   = hoje;
+    inputDataDash.readOnly = true;
+  }
+
   const btnAbrir = document.getElementById("btnAbrirCaixa");
   if (btnAbrir && !btnAbrir.dataset.bound) {
     btnAbrir.dataset.bound = "dashboard";
@@ -295,8 +342,15 @@ function initCaixaPage(hoje) {
   if (!btnFechar) return;
 
   const btnAbrir  = document.getElementById("btnAbrirCaixa");
+
+  // CORREÇÃO: trava o input de data no dia atual
   const inputData = document.getElementById("dataCaixa");
-  if (inputData && !inputData.value) inputData.value = hoje;
+  if (inputData) {
+    inputData.value    = hoje;
+    inputData.min      = hoje;
+    inputData.max      = hoje;
+    inputData.readOnly = true;
+  }
 
   carregarStatusCaixa();
 
