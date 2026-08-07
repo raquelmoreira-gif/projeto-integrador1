@@ -1,3 +1,7 @@
 # Ignorar arquivos compilados Python
 __pycache__/
 *.pyc
+
+.env
+backend/.env
+*.env
